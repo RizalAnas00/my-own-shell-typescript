@@ -5,18 +5,18 @@ const rl = createInterface({
   output: process.stdout,
 });
 
-const validTypeCommands = ["echo", "type", "exit"];
+const validTypeCommands: string[] = ["echo", "type", "exit"];
 
-function handleTypeCommand(command: string) {
+function handleTypeCommand(command: string): void {
   if (!validTypeCommands.includes(command)) {
     rl.write(`${command}: not found\n`);
     return;
   } else {
-    rl.write(`${command}: is a shell builtin\n`);
+    rl.write(`${command} is a shell builtin\n`);
   }
 }
 
-function handleCommand(command: string, args: string[]) {
+function handleCommand(command: string, args: string[]): void {
   switch (command) {
     case "echo":
         rl.write(args.join(" ") + "\n");
@@ -33,7 +33,7 @@ function handleCommand(command: string, args: string[]) {
   }
 }
 
-function loop() {
+function loop(): void {
   rl.question("$ ", (answer) => {
     const input = answer.trim();
     const parts = input.split(" ");
