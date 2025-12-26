@@ -5,23 +5,38 @@ const rl = createInterface({
   output: process.stdout,
 });
 
-rl.setPrompt("$ ");
-rl.prompt();
-
-rl.on("line", (line) => {
-  const command = line.trim();
-
-  if (command === "exit") {
-    rl.close();
-    return;
-  } 
-
-  if (command) {
-    console.log(`${command}: command not found`);
+function handleCommand(command: string, args: string[]) {
+  switch (command) {
+    case "echo":
+        rl.write(args.join(" ") + "\n");
+        break;
+    default:
+        rl.write(`${command}: command not found\n`);
   }
-  rl.prompt();
-});
+}
 
-rl.on("exit", () => {
-  process.exit(0);
-});
+function loop() {
+  rl.question("$ ", (answer) => {
+    const input = answer.trim();
+    const parts = input.split(" ");
+
+    if (parts.length > 0) {
+      const [command, ...args] = parts;
+      
+      if (command === 'exit') {
+        rl.close();
+        return;
+      } else {
+        handleCommand(command, args);
+      }
+    }
+
+    loop();
+  });
+}
+
+function main() {
+  loop();
+}
+
+main();
