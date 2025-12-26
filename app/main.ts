@@ -13,6 +13,7 @@ rl.on("line", (line) => {
 
   if (command === "exit") {
     rl.close();
+    return;
   } 
 
   if (command) {
