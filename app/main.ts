@@ -16,6 +16,6 @@ rl.on("line", (line) => {
   rl.prompt();
 });
 
-rl.on("close", () => {
+rl.on("exit", () => {
   process.exit(0);
 });
