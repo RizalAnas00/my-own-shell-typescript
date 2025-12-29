@@ -42,8 +42,9 @@ function pathLocateExec(command: string[]): string | null {
 function handleCustomCommand(command: string[]): void {
   const result = pathLocateExec(command);
   if (result) {
+    const filename = path.basename(result);
     const args = command.slice(1);
-    const proc = spawn(result, args, { stdio: 'inherit' });
+    const proc = spawn(filename, args, { stdio: 'inherit' });
 
     proc.on('exit', () => {
       loop(); 
@@ -53,6 +54,7 @@ function handleCustomCommand(command: string[]): void {
       loop();
     });
   } else {
+    // if command not found and not a builtin
     commandNotFound(command[0]);
     loop();
   }
