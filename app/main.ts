@@ -13,11 +13,11 @@ const validTypeCommands: string[] = ["echo", "type", "exit"];
 // ----------------- ERROR HANDLING ---------------- //
 
 function commandNotFound(command: string): void {
-  console.log(`${command}: command not found\n`);
+  process.stdout.write(`${command}: command not found\n`);
 }
 
 function typeNotFound(command: string): void {
-  console.log(`${command}: not found\n`);
+  process.stdout.write(`${command}: not found\n`);
 }
 
 // ----------------- ERROR HANDLING END ---------------- //
@@ -62,13 +62,13 @@ function handleCustomCommand(command: string[]): void {
 
 function handleTypeCommand(command: string[]): void {
   if (validTypeCommands.includes(command[0])) {
-    console.log(`${command[0]} is a shell builtin\n`);
+    process.stdout.write(`${command[0]} is a shell builtin\n`);
     return;
   }
 
   const result = pathLocateExec(command);
   if (result) {
-    console.log(`${command[0]} is ${result}\n`);
+    process.stdout.write(`${command[0]} is ${result}\n`);
   } else {
     typeNotFound(command[0]);
   }
@@ -77,11 +77,11 @@ function handleTypeCommand(command: string[]): void {
 function handleCommand(command: string, args: string[]): void {
   switch (command) {
     case "echo":
-        console.log(args.join(" ") + "\n");
+        process.stdout.write(args.join(" ") + "\n");
         break;
     case "type":
         if (args.length === 0) {
-          console.log("type: missing operand\n");
+          process.stdout.write("type: missing operand\n");
         } else {
           handleTypeCommand(args);
         }
@@ -92,7 +92,7 @@ function handleCommand(command: string, args: string[]): void {
 }
 
 function loop(): void {
-  console.log("$ ");
+  process.stdout.write("$ ");
 
   rl.question("", (answer) => {
     const input = answer.trim();
