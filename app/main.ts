@@ -1,6 +1,7 @@
 import path from "path";
 import { accessSync, constants } from "fs";
 import { createInterface } from "readline";
+import { spawn } from "child_process";
 
 const rl = createInterface({
   input: process.stdin,
@@ -9,22 +10,7 @@ const rl = createInterface({
 
 const validTypeCommands: string[] = ["echo", "type", "exit"];
 
-function pathLocateExec(command: string): string | null {
-  // Real look up of executable in PATH Env in this PC
-  const paths = process.env.PATH?.split(path.delimiter) || [];
-
-  for (const p of paths) {
-    const fullPath = path.join(p, command);
-    try {
-      accessSync(fullPath, constants.X_OK);
-      return `${command} is ${fullPath}\n`;
-    } catch {
-      // ignore
-    }
-  }
-
-  return null;
-}
+// ----------------- ERROR HANDLING ---------------- //
 
 function commandNotFound(command: string): void {
   rl.write(`${command}: command not found\n`);
@@ -34,17 +20,50 @@ function typeNotFound(command: string): void {
   rl.write(`${command}: not found\n`);
 }
 
-function handleTypeCommand(command: string): void {
-  if (validTypeCommands.includes(command)) {
-    rl.write(`${command} is a shell builtin\n`);
+// ----------------- ERROR HANDLING END ---------------- //
+
+function pathLocateExec(command: string[]): string | null {
+  // Real look up of executable in PATH Env in this PC
+  const paths = process.env.PATH?.split(path.delimiter) || [];
+
+  for (const p of paths) {
+    const fullPath = path.join(p, command[0]);
+    try {
+      accessSync(fullPath, constants.X_OK);
+      // return `${command} is ${fullPath}\n`;
+      return fullPath;
+    } catch {
+      // ignore
+    }
+  }
+
+  return null;
+}
+
+function handleTypeCommand(command: string[]): void {
+  if (validTypeCommands.includes(command[0])) {
+    rl.write(`${command[0]} is a shell builtin\n`);
     return;
   }
 
   const result = pathLocateExec(command);
   if (result) {
-    rl.write(result);
+    const fileName = path.basename(result);
+    const args = [command[1], ...command.slice(2)];
+
+    const proc = spawn(fileName, args, { stdio: 'inherit' });
+
+    proc.on('error', (err) => {
+      rl.write(`Error executing ${fileName}: ${err.message}\n`);
+    });
+
+    proc.on('exit', (code) => {
+      if (code !== 0) {
+        rl.write(`${fileName} exited with code ${code}\n`);
+      }
+    }) 
   } else {
-    typeNotFound(command);
+    typeNotFound(command[0]);
   }
 }
 
@@ -57,7 +76,7 @@ function handleCommand(command: string, args: string[]): void {
         if (args.length === 0) {
           rl.write("type: missing operand\n");
         } else {
-          handleTypeCommand(args[0]);
+          handleTypeCommand(args);
         }
         break;
     default:
