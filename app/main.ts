@@ -1,3 +1,4 @@
+import path from "path";
 import { createInterface } from "readline";
 
 const rl = createInterface({
@@ -7,10 +8,29 @@ const rl = createInterface({
 
 const validTypeCommands: string[] = ["echo", "type", "exit"];
 
+function pathLocateExec(command: string): string | null {
+  // Real look up of executable in PATH Env in this PC
+  const paths = (process.env.PATH?.split(path.delimiter) || "");
+  for (const p of paths) {
+    const fullPath = path.join(p, command);
+    try {
+      if (require("fs").existsSync(fullPath)) {
+        return fullPath;
+      }    } catch (err) {
+      // Ignore errors
+    }
+  }
+
+  return commandNotFound(command), null;
+}
+
+function commandNotFound(command: string): void {
+  rl.write(`${command}: command not found\n`);
+}
+
 function handleTypeCommand(command: string): void {
   if (!validTypeCommands.includes(command)) {
-    rl.write(`${command}: not found\n`);
-    return;
+    pathLocateExec(command);
   } else {
     rl.write(`${command} is a shell builtin\n`);
   }
