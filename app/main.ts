@@ -5,7 +5,7 @@ import { spawn } from "child_process";
 
 const rl = createInterface({
   input: process.stdin,
-  output: process.stdout,
+  // output: process.stdout,
 });
 
 const validTypeCommands: string[] = ["echo", "type", "exit"];
@@ -25,11 +25,7 @@ function typeNotFound(command: string): void {
 
 // ----------------- Utils ---------------- //
 function print(text: string): void {
-  if (!rl.close) {
-    rl.write(text);
-  } else {
-    process.stdout.write(text);
-  }
+  rl.write(text);
 }
 // ----------------- Utils END ---------------- //
 
