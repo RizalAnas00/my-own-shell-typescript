@@ -40,12 +40,7 @@ function pathLocateExec(command: string[]): string | null {
   return null;
 }
 
-function handleTypeCommand(command: string[]): void {
-  if (validTypeCommands.includes(command[0])) {
-    rl.write(`${command[0]} is a shell builtin\n`);
-    return;
-  }
-
+function handleCustomCommand(command: string[]): void {
   const result = pathLocateExec(command);
   if (result) {
     const fileName = path.basename(result);
@@ -61,7 +56,21 @@ function handleTypeCommand(command: string[]): void {
       if (code !== 0) {
         rl.write(`${fileName} exited with code ${code}\n`);
       }
-    }) 
+    })   
+  } else {
+    commandNotFound(command[0]);
+  }
+}
+
+function handleTypeCommand(command: string[]): void {
+  if (validTypeCommands.includes(command[0])) {
+    rl.write(`${command[0]} is a shell builtin\n`);
+    return;
+  }
+
+  const result = pathLocateExec(command);
+  if (result) {
+    rl.write(`${command[0]} is ${result}\n`);
   } else {
     typeNotFound(command[0]);
   }
@@ -80,7 +89,7 @@ function handleCommand(command: string, args: string[]): void {
         }
         break;
     default:
-        commandNotFound(command);
+        handleCustomCommand([command, ...args]);
   }
 }
 
