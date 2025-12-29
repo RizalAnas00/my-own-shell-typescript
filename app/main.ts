@@ -30,6 +30,10 @@ function commandNotFound(command: string): void {
   rl.write(`${command}: command not found\n`);
 }
 
+function typeNotFound(command: string): void {
+  rl.write(`${command}: not found\n`);
+}
+
 function handleTypeCommand(command: string): void {
   if (validTypeCommands.includes(command)) {
     rl.write(`${command} is a shell builtin\n`);
@@ -40,7 +44,7 @@ function handleTypeCommand(command: string): void {
   if (result) {
     rl.write(result);
   } else {
-    commandNotFound(command);
+    typeNotFound(command);
   }
 }
 
