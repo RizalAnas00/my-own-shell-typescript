@@ -10,18 +10,18 @@ const validTypeCommands: string[] = ["echo", "type", "exit"];
 
 function pathLocateExec(command: string): string | null {
   // Real look up of executable in PATH Env in this PC
-  const paths = (process.env.PATH?.split(path.delimiter) || "");
+  const paths = process.env.PATH?.split(path.delimiter) || [];
+
   for (const p of paths) {
     const fullPath = path.join(p, command);
     try {
       if (require("fs").existsSync(fullPath)) {
-        return fullPath;
-      }    } catch (err) {
-      // Ignore errors
-    }
+        return `${command} is ${fullPath}\n`;
+      }
+    } catch {}
   }
 
-  return commandNotFound(command), null;
+  return null;
 }
 
 function commandNotFound(command: string): void {
@@ -29,10 +29,16 @@ function commandNotFound(command: string): void {
 }
 
 function handleTypeCommand(command: string): void {
-  if (!validTypeCommands.includes(command)) {
-    pathLocateExec(command);
-  } else {
+  if (validTypeCommands.includes(command)) {
     rl.write(`${command} is a shell builtin\n`);
+    return;
+  }
+
+  const result = pathLocateExec(command);
+  if (result) {
+    rl.write(result);
+  } else {
+    commandNotFound(command);
   }
 }
 
@@ -49,7 +55,7 @@ function handleCommand(command: string, args: string[]): void {
         }
         break;
     default:
-        rl.write(`${command}: command not found\n`);
+        commandNotFound(command);
   }
 }
 
