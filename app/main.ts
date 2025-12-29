@@ -108,7 +108,11 @@ function handleCommand(command: string, args: string[]): void {
       break;
     case "cd":
       const dir = args[0] || process.env.HOME || "";
-      process.chdir(dir);
+      try {
+        process.chdir(dir);
+      } catch (err) {
+        print(`cd: ${dir}: No such file or directory\n`);
+      }
       loop();
       break;
     default:
