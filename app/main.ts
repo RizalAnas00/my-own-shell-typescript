@@ -5,7 +5,7 @@ import { spawn } from "child_process";
 
 const rl = createInterface({
   input: process.stdin,
-  output: process.stdout,
+  // output: process.stdout,
 });
 
 const validTypeCommands: string[] = ["echo", "type", "exit"];
@@ -13,11 +13,11 @@ const validTypeCommands: string[] = ["echo", "type", "exit"];
 // ----------------- ERROR HANDLING ---------------- //
 
 function commandNotFound(command: string): void {
-  rl.write(`${command}: command not found\n`);
+  console.log(`${command}: command not found\n`);
 }
 
 function typeNotFound(command: string): void {
-  rl.write(`${command}: not found\n`);
+  console.log(`${command}: not found\n`);
 }
 
 // ----------------- ERROR HANDLING END ---------------- //
@@ -44,18 +44,16 @@ function handleCustomCommand(command: string[]): void {
   const result = pathLocateExec(command);
   if (result) {
     const fileName = path.basename(result);
-    const args = [command[1], ...command.slice(2)];
+    const args = command.slice(1);
 
-    const proc = spawn(fileName, args, { stdio: 'pipe' });
+    const proc = spawn(fileName, args, { stdio: 'inherit' });
 
     proc.on('error', (err) => {
-      rl.write(`Error executing ${fileName}: ${err.message}\n`);
+      loop();
     });
 
-    proc.on('exit', (code) => {
-      if (code !== 0) {
-        rl.write(`${fileName} exited with code ${code}\n`);
-      }
+    proc.on('exit', () => {
+      loop();
     })   
   } else {
     commandNotFound(command[0]);
@@ -64,13 +62,13 @@ function handleCustomCommand(command: string[]): void {
 
 function handleTypeCommand(command: string[]): void {
   if (validTypeCommands.includes(command[0])) {
-    rl.write(`${command[0]} is a shell builtin\n`);
+    console.log(`${command[0]} is a shell builtin\n`);
     return;
   }
 
   const result = pathLocateExec(command);
   if (result) {
-    rl.write(`${command[0]} is ${result}\n`);
+    console.log(`${command[0]} is ${result}\n`);
   } else {
     typeNotFound(command[0]);
   }
@@ -79,11 +77,11 @@ function handleTypeCommand(command: string[]): void {
 function handleCommand(command: string, args: string[]): void {
   switch (command) {
     case "echo":
-        rl.write(args.join(" ") + "\n");
+        console.log(args.join(" ") + "\n");
         break;
     case "type":
         if (args.length === 0) {
-          rl.write("type: missing operand\n");
+          console.log("type: missing operand\n");
         } else {
           handleTypeCommand(args);
         }
@@ -94,7 +92,9 @@ function handleCommand(command: string, args: string[]): void {
 }
 
 function loop(): void {
-  rl.question("$ ", (answer) => {
+  console.log("$ ");
+
+  rl.question("", (answer) => {
     const input = answer.trim();
     const parts = input.split(" ");
 
