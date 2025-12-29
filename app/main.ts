@@ -46,7 +46,7 @@ function handleCustomCommand(command: string[]): void {
     const fileName = path.basename(result);
     const args = [command[1], ...command.slice(2)];
 
-    const proc = spawn(fileName, args, { stdio: 'inherit' });
+    const proc = spawn(fileName, args, { stdio: 'pipe' });
 
     proc.on('error', (err) => {
       rl.write(`Error executing ${fileName}: ${err.message}\n`);
