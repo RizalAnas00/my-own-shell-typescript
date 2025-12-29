@@ -1,4 +1,5 @@
 import path from "path";
+import { accessSync, constants } from "fs";
 import { createInterface } from "readline";
 
 const rl = createInterface({
@@ -15,10 +16,11 @@ function pathLocateExec(command: string): string | null {
   for (const p of paths) {
     const fullPath = path.join(p, command);
     try {
-      if (require("fs").existsSync(fullPath)) {
-        return `${command} is ${fullPath}\n`;
-      }
-    } catch {}
+      accessSync(fullPath, constants.X_OK);
+      return `${command} is ${fullPath}\n`;
+    } catch {
+      // ignore
+    }
   }
 
   return null;
