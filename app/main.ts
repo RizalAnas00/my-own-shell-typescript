@@ -47,6 +47,7 @@ function handleCustomCommand(command: string[]): void {
 
   if (!result) {
     commandNotFound(command[0]);
+    rl.prompt();
     return;
   }
 
@@ -59,11 +60,13 @@ function handleCustomCommand(command: string[]): void {
 
   proc.on("close", () => {
     rl.resume();
+    rl.prompt();
   });
 
   proc.on("error", (err) => {
     rl.write(`Error executing ${fileName}: ${err.message}\n`);
     rl.resume();
+    rl.prompt();
   });
 }
 
@@ -99,7 +102,7 @@ function handleCommand(command: string, args: string[]): void {
 }
 
 function loop(): void {
-  rl.prompt();
+  // rl.prompt();
 
   rl.once("line", (answer) => {
     const input = answer.trim();
