@@ -8,7 +8,7 @@ const rl = createInterface({
   // output: process.stdout,
 });
 
-const validTypeCommands: string[] = ["echo", "type", "exit"];
+const validTypeCommands: string[] = ["echo", "type", "exit", "pwd"];
 
 // ----------------- ERROR HANDLING ---------------- //
 
@@ -94,6 +94,10 @@ function handleCommand(command: string, args: string[]): void {
       } else {
         handleTypeCommand(args);
       }
+      loop();
+      break;
+    case "pwd":
+      print(process.cwd() + "\n");
       loop();
       break;
     default:
