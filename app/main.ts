@@ -25,7 +25,7 @@ function typeNotFound(command: string): void {
 
 // ----------------- Utils ---------------- //
 function print(text: string): void {
-  rl.write(text);
+  process.stdout.write(text);
 }
 // ----------------- Utils END ---------------- //
 
