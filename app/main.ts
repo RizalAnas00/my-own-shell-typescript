@@ -114,30 +114,64 @@ function handleChangeDirectory(args: string[]): void {
 }
 
 function handleEchoCommand(args: string[]): void {
-  // single quote handling
-  for (let i = 0; i < args.length; i++) {
-    if (args[i].startsWith("'") && args[i].endsWith("'")) {
-      args[i] = args[i].slice(1, -1);
-    }
-  }
   print(args.join(" ") + "\n");
 }
 
 function handleCatCommand(args: string[]): void {
-  const filePath = args[0];
+  var errorArgs: string[] = [];
   try {
-    const data = readFileSync(filePath, 'utf8');
-    print(data);
+    for (const filePath of args) {
+      if(readFileSync(filePath, 'utf-8')) {
+        const content = readFileSync(filePath, 'utf-8');
+        print(content);
+      } else {
+        errorArgs.push(filePath);
+      }
+    }
   } catch (err) {
-    print(`cat: ${filePath}: No such file or directory\n`);
+    for (const errorFile of errorArgs) {
+      print(`cat: ${errorFile}: No such file or directory\n`);
+    }
   }
 }
 // ----------------- Commands Handling END ---------------- //
 
+// ---------------- Parser ---------------- //
+function parseArgs(input: string): string[] {
+  const result: string[] = [];
+  let current = "";
+  let inSingleQuote = false;
+
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+
+    if (ch === "'") {
+      inSingleQuote = !inSingleQuote;
+      continue;
+    }
+
+    if (ch === " " && !inSingleQuote) {
+      if (current !== "") {
+        result.push(current);
+        current = "";
+      }
+    } else {
+      current += ch;
+    }
+  }
+
+  if (current !== "") {
+    result.push(current);
+  }
+
+  return result;
+}
+// ---------------- Parser END ---------------- //
 function handleCommand(command: string, args: string[]): void {
+  const parsedArgs = parseArgs(args.join(" "));
   switch (command) {
     case "echo":
-      handleEchoCommand(args);
+      handleEchoCommand(parsedArgs);
       loop();
       break;
     case "type":
