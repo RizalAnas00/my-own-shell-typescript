@@ -184,7 +184,7 @@ function handleCommand(command: string, args: string[]): void {
       loop();
       break;
     case "cat":
-      handleCatCommand(args);
+      handleCatCommand(parsedArgs);
       loop();
       break;
     default:
