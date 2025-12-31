@@ -17,7 +17,6 @@ const validTypeCommands: string[] = [
 ];
 
 // ----------------- ERROR HANDLING ---------------- //
-
 function commandNotFound(command: string): void {
   print(`${command}: command not found\n`);
 }
@@ -25,7 +24,6 @@ function commandNotFound(command: string): void {
 function typeNotFound(command: string): void {
   print(`${command}: not found\n`);
 }
-
 // ----------------- ERROR HANDLING END ---------------- //
 
 
@@ -33,6 +31,7 @@ function typeNotFound(command: string): void {
 function print(text: string): void {
   process.stdout.write(text);
 }
+
 // ----------------- Utils END ---------------- //
 
 
@@ -129,35 +128,45 @@ function handleCatCommand(args: string[]): void {
 // ----------------- Commands Handling END ---------------- //
 
 // ---------------- Parser ---------------- //
+
 function parseArgs(input: string): string[] {
   const result: string[] = [];
   let current = "";
+
   let inSingleQuote = false;
+  let inDoubleQuote = false;
 
   for (let i = 0; i < input.length; i++) {
     const ch = input[i];
 
-    if (ch === "'") {
+    if (ch === "'" && !inDoubleQuote) {
       inSingleQuote = !inSingleQuote;
       continue;
     }
 
-    if (ch === " " && !inSingleQuote) {
-      if (current !== "") {
+    if (ch === '"' && !inSingleQuote) {
+      inDoubleQuote = !inDoubleQuote;
+      continue;
+    }
+
+    if (ch === " " && !inSingleQuote && !inDoubleQuote) {
+      if (current.length > 0) {
         result.push(current);
         current = "";
       }
-    } else {
-      current += ch;
+      continue;
     }
+
+    current += ch;
   }
 
-  if (current !== "") {
+  if (current.length > 0) {
     result.push(current);
   }
 
   return result;
 }
+
 // ---------------- Parser END ---------------- //
 function handleCommand(command: string, args: string[]): void {
   const parsedArgs = parseArgs(args.join(" "));
