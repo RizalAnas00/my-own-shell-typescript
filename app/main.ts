@@ -1,5 +1,5 @@
 import path from "path";
-import { accessSync, constants } from "fs";
+import { accessSync, constants, readFileSync } from "fs";
 import { createInterface } from "readline";
 import { spawn } from "child_process";
 
@@ -14,6 +14,7 @@ const validTypeCommands: string[] = [
   "exit", 
   "pwd",
   "cd",
+  "cat"
 ];
 
 // ----------------- ERROR HANDLING ---------------- //
@@ -111,12 +112,32 @@ function handleChangeDirectory(args: string[]): void {
     print(`cd: ${dir}: No such file or directory\n`);
   }
 }
+
+function handleEchoCommand(args: string[]): void {
+  // single quote handling
+  for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith("'") && args[i].endsWith("'")) {
+      args[i] = args[i].slice(1, -1);
+    }
+  }
+  print(args.join(" ") + "\n");
+}
+
+function handleCatCommand(args: string[]): void {
+  const filePath = args[0];
+  try {
+    const data = readFileSync(filePath, 'utf8');
+    print(data);
+  } catch (err) {
+    print(`cat: ${filePath}: No such file or directory\n`);
+  }
+}
 // ----------------- Commands Handling END ---------------- //
 
 function handleCommand(command: string, args: string[]): void {
   switch (command) {
     case "echo":
-      print(args.join(" ") + "\n");
+      handleEchoCommand(args);
       loop();
       break;
     case "type":
@@ -133,6 +154,10 @@ function handleCommand(command: string, args: string[]): void {
       break;
     case "cd":
       handleChangeDirectory(args);
+      loop();
+      break;
+    case "cat":
+      handleCatCommand(args);
       loop();
       break;
     default:
