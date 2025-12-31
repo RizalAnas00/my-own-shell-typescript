@@ -14,7 +14,6 @@ const validTypeCommands: string[] = [
   "exit", 
   "pwd",
   "cd",
-  "cat"
 ];
 
 // ----------------- ERROR HANDLING ---------------- //
