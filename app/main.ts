@@ -118,20 +118,13 @@ function handleEchoCommand(args: string[]): void {
 }
 
 function handleCatCommand(args: string[]): void {
-  var errorArgs: string[] = [];
   try {
     for (const filePath of args) {
-      if(readFileSync(filePath, 'utf-8')) {
-        const content = readFileSync(filePath, 'utf-8');
-        print(content);
-      } else {
-        errorArgs.push(filePath);
-      }
+      const data = readFileSync(filePath, 'utf-8');
+      print(data);
     }
   } catch (err) {
-    for (const errorFile of errorArgs) {
-      print(`cat: ${errorFile}: No such file or directory\n`);
-    }
+    print(`No such file or directory\n`);
   }
 }
 // ----------------- Commands Handling END ---------------- //
