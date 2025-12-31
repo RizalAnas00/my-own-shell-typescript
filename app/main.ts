@@ -35,6 +35,8 @@ function print(text: string): void {
 }
 // ----------------- Utils END ---------------- //
 
+
+// ----------------- Commands Handling ---------------- //
 function pathLocateExec(command: string[]): string | null {
   // Real look up of executable in PATH Env in this PC
   const paths = process.env.PATH?.split(path.delimiter) || [];
@@ -88,6 +90,29 @@ function handleTypeCommand(command: string[]): void {
   }
 }
 
+function handleWorkingDirectory(args: string[]): void {
+  if(args[0] == "~") {
+    print(process.env.HOME + "\n");
+    return;
+  }
+
+  print(process.cwd() + "\n");
+}
+
+function handleChangeDirectory(args: string[]): void {
+  const dir = args[0] || process.env.HOME || "";
+  try {
+    if (dir === "~") {
+      process.chdir(process.env.HOME || "");
+      return;
+    }
+    process.chdir(dir);
+  } catch (err) {
+    print(`cd: ${dir}: No such file or directory\n`);
+  }
+}
+// ----------------- Commands Handling END ---------------- //
+
 function handleCommand(command: string, args: string[]): void {
   switch (command) {
     case "echo":
@@ -103,16 +128,11 @@ function handleCommand(command: string, args: string[]): void {
       loop();
       break;
     case "pwd":
-      print(process.cwd() + "\n");
+      handleWorkingDirectory(args);
       loop();
       break;
     case "cd":
-      const dir = args[0] || process.env.HOME || "";
-      try {
-        process.chdir(dir);
-      } catch (err) {
-        print(`cd: ${dir}: No such file or directory\n`);
-      }
+      handleChangeDirectory(args);
       loop();
       break;
     default:
