@@ -130,28 +130,50 @@ function handleCatCommand(args: string[]): void {
 // ---------------- Parser ---------------- //
 
 function parseArgs(input: string): string[] {
-  const result: string[] = [];
+  const args: string[] = [];
   let current = "";
 
   let inSingleQuote = false;
   let inDoubleQuote = false;
+  let escaped = false;
 
   for (let i = 0; i < input.length; i++) {
     const ch = input[i];
 
+    // handle escaped char
+    if (escaped) {
+      current += ch;
+      escaped = false;
+      continue;
+    }
+
+    // backslash logic
+    if (ch === "\\") {
+      if (!inSingleQuote) {
+        escaped = true;
+        continue;
+      }
+      // inside single quote -> literal
+      current += ch;
+      continue;
+    }
+
+    // single quote toggle
     if (ch === "'" && !inDoubleQuote) {
       inSingleQuote = !inSingleQuote;
       continue;
     }
 
+    // double quote toggle
     if (ch === '"' && !inSingleQuote) {
       inDoubleQuote = !inDoubleQuote;
       continue;
     }
 
+    // argument separator
     if (ch === " " && !inSingleQuote && !inDoubleQuote) {
       if (current.length > 0) {
-        result.push(current);
+        args.push(current);
         current = "";
       }
       continue;
@@ -161,10 +183,10 @@ function parseArgs(input: string): string[] {
   }
 
   if (current.length > 0) {
-    result.push(current);
+    args.push(current);
   }
 
-  return result;
+  return args;
 }
 
 // ---------------- Parser END ---------------- //
