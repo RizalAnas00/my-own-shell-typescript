@@ -158,7 +158,7 @@ function parseArgs(input: string): string[] {
         if (next === "\\" || next === '"' || next === "$" || next === "`") {
           escaped = true;
         } else {
-          continue;
+          current += "\\";
         }
       } else {
         // outside quotes = escape anything
