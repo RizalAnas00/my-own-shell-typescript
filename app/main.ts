@@ -6,7 +6,7 @@ import { execute } from "./executor/execute";
 const rl = createInterface({ input: process.stdin });
 
 function loop() {  
-  rl.question("", (line) => {
+  rl.question("$ ", (line) => {
     const tokens = parseArgs(line.trim());
     execute(tokens, loop);
   });
