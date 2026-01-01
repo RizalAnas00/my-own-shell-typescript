@@ -40,9 +40,6 @@ export function tryBuiltin(tokens: string[]): boolean {
         process.exit(0);
 
     default:
-        handleCustomCommand(tokens, () => {});
-        return true;
+        return false;
   }
-
-  return false;
 }

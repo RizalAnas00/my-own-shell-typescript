@@ -1,5 +1,6 @@
 import { tryBuiltin } from "./builtin";
 import { executeExternal } from "./external";
+import { handleCustomCommand } from "../types/command";
 
 export function execute(tokens: string[], next: () => void) {
   if (tokens.length === 0) {
@@ -12,5 +13,5 @@ export function execute(tokens: string[], next: () => void) {
     return;
   }
 
-  executeExternal(tokens, next);
+  handleCustomCommand(tokens, next);
 }
