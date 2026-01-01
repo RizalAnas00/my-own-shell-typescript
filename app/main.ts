@@ -133,45 +133,54 @@ function parseArgs(input: string): string[] {
   const args: string[] = [];
   let current = "";
 
-  let inSingleQuote = false;
-  let inDoubleQuote = false;
+  let inSingle = false;
+  let inDouble = false;
   let escaped = false;
 
   for (let i = 0; i < input.length; i++) {
     const ch = input[i];
 
-    // handle escaped char
+    // escape
     if (escaped) {
       current += ch;
       escaped = false;
       continue;
     }
 
-    // backslash logic
+    // backslash
     if (ch === "\\") {
-      if (!inSingleQuote) {
+      if (inSingle) {
+        // literal inside single quotes
+        current += "\\";
+      } else if (inDouble) {
+        // only escape specific chars in double quotes
+        const next = input[i + 1];
+        if (next === "\\" || next === '"' || next === "$" || next === "`") {
+          escaped = true;
+        } else {
+          continue;
+        }
+      } else {
+        // outside quotes = escape anything
         escaped = true;
-        continue;
       }
-      // inside single quote -> literal
-      current += ch;
       continue;
     }
 
-    // single quote toggle
-    if (ch === "'" && !inDoubleQuote) {
-      inSingleQuote = !inSingleQuote;
+    // single quote
+    if (ch === "'" && !inDouble) {
+      inSingle = !inSingle;
       continue;
     }
 
-    // double quote toggle
-    if (ch === '"' && !inSingleQuote) {
-      inDoubleQuote = !inDoubleQuote;
+    // double quote
+    if (ch === '"' && !inSingle) {
+      inDouble = !inDouble;
       continue;
     }
 
     // argument separator
-    if (ch === " " && !inSingleQuote && !inDoubleQuote) {
+    if (ch === " " && !inSingle && !inDouble) {
       if (current.length > 0) {
         args.push(current);
         current = "";
