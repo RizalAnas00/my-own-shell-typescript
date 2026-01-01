@@ -200,10 +200,9 @@ function parseArgs(input: string): string[] {
 
 // ---------------- Parser END ---------------- //
 function handleCommand(command: string, args: string[]): void {
-  const parsedArgs = parseArgs(args.join(" "));
   switch (command) {
     case "echo":
-      handleEchoCommand(parsedArgs);
+      handleEchoCommand(args);
       loop();
       break;
     case "type":
@@ -223,7 +222,7 @@ function handleCommand(command: string, args: string[]): void {
       loop();
       break;
     case "cat":
-      handleCatCommand(parsedArgs);
+      handleCatCommand(args);
       loop();
       break;
     default:
@@ -242,7 +241,7 @@ function loop(): void {
       return;
     }
 
-    const parts = input.split(" ");
+    const parts = parseArgs(input);
     const [command, ...args] = parts;
 
     if (command === 'exit') {
