@@ -1,7 +1,7 @@
 import { tryBuiltin } from "./builtin";
 import { handleCustomCommand } from "../types/command";
 import { parseRedirection } from "../parser/parseArgs";
-import { createWriteStream } from "fs";
+import { openSync, closeSync } from "fs";
 
 export function execute(tokens: string[], next: () => void) {
   if (tokens.length === 0) {
@@ -10,15 +10,13 @@ export function execute(tokens: string[], next: () => void) {
   }
 
   const { args, stdoutFile } = parseRedirection(tokens);
+  const fd = stdoutFile ? openSync(stdoutFile, "w") : null;
 
-  const output =
-    stdoutFile ? createWriteStream(stdoutFile, { flags: "w" }) : null;
-
-  if (tryBuiltin(args, output)) {
-    if (output) output.end();
+  if (tryBuiltin(args, fd)) {
+    if (fd !== null) closeSync(fd);
     next();
     return;
   }
 
-  handleCustomCommand(args, next, output);
+  handleCustomCommand(args, next, fd);
 }

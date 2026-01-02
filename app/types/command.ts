@@ -1,15 +1,14 @@
 import { spawn } from "child_process";
 import path from "path";
 import { pathLocateExec } from "../utils/pathLocate";
-import { readFileSync } from "fs";
-import { Writable } from "stream";
+import { readFileSync, writeSync } from "fs";
 import { commandNotFound, typeNotFound } from "../utils/notFound";
 import { validTypeCommands } from "../types/validBuiltin";
 
 export function handleCustomCommand(
   command: string[],
   loop: () => void,
-  out: Writable | null
+  fd: number | null
 ): void {
   const result = pathLocateExec(command);
 
@@ -25,17 +24,13 @@ export function handleCustomCommand(
   const proc = spawn(filename, args, {
     stdio: [
       "inherit",
-      out ?? "inherit", // stdout
-      "inherit"         // stderr
+      fd !== null ? fd : "inherit",
+      "inherit"
     ]
   });
 
   proc.on("exit", () => loop());
   proc.on("error", () => loop());
-}
-
-export function handleWorkingDirectory(args: string[]): void {
-  console.log(process.cwd());
 }
 
 export function handleChangeDirectory(args: string[]): void {

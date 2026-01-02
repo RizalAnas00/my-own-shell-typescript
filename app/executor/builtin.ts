@@ -1,20 +1,20 @@
-import { Writable } from "stream";
+import { writeSync } from "fs";
 import { print } from "../utils/print";
 import {
   handleCatCommand,
   handleChangeDirectory,
-  handleTypeCommand,
+  handleTypeCommand
 } from "../types/command";
 
 export function tryBuiltin(
   tokens: string[],
-  out: Writable | null
+  fd: number | null
 ): boolean {
   const cmd = tokens[0];
   const args = tokens.slice(1);
 
   const write = (msg: string) => {
-    if (out) out.write(msg);
+    if (fd !== null) writeSync(fd, msg);
     else print(msg);
   };
 
