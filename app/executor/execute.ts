@@ -1,17 +1,31 @@
 import { tryBuiltin } from "./builtin";
-import { executeExternal } from "./external";
+// import { executeExternal } from "./external";
 import { handleCustomCommand } from "../types/command";
+import { setOutputTarget } from "../utils/print";
+import type { ParsedCommand } from "../parser/parseArgs";
 
-export function execute(tokens: string[], next: () => void) {
-  if (tokens.length === 0) {
+export function execute(parsed: ParsedCommand, next: () => void) {
+  const { args, redirectFile } = parsed;
+
+  if (args.length === 0) {
     next();
     return;
   }
 
-  if (tryBuiltin(tokens)) {
+  // Set target output sebelum eksekusi
+  if (redirectFile) {
+    setOutputTarget(redirectFile);
+  }
+
+  const finalize = () => {
+    setOutputTarget(null); // Kembalikan ke terminal setelah selesai
     next();
+  };
+
+  if (tryBuiltin(args)) {
+    finalize();
     return;
   }
 
-  handleCustomCommand(tokens, next);
+  handleCustomCommand(args, finalize, redirectFile);
 }

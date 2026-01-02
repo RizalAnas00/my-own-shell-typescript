@@ -6,22 +6,37 @@ import { readFileSync } from "fs";
 import { commandNotFound, typeNotFound } from "../utils/notFound";
 import { validTypeCommands } from "../types/validBuiltin";
 
-export function handleCustomCommand(command: string[], loop: () => void): void {
+import { createWriteStream } from "fs";
+
+export function handleCustomCommand(
+  command: string[], 
+  loop: () => void, 
+  redirectFile: string | null = null
+): void {
   const result = pathLocateExec(command);
   if (result) {
     const filename = path.basename(result);
     const args = command.slice(1);
-    const proc = spawn(filename, args, { stdio: 'inherit' });
+    const stdio: any = ['inherit', 'inherit', 'inherit'];
+    
+    let outStream: any = null;
+    if (redirectFile) {
+      outStream = createWriteStream(redirectFile);
+      stdio[1] = outStream;
+    }
+
+    const proc = spawn(filename, args, { stdio });
 
     proc.on('exit', () => {
-      loop(); 
+      if (outStream) outStream.end();
+      loop();
     });
 
     proc.on('error', (err) => {
+      print(`Error: ${err.message}\n`);
       loop();
     });
   } else {
-    // if command not found and not a builtin
     commandNotFound(command[0]);
     loop();
   }

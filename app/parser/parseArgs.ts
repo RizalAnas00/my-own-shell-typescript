@@ -1,5 +1,10 @@
-export function parseArgs(input: string): string[] {
-  const args: string[] = [];
+export interface ParsedCommand {
+  args: string[];
+  redirectFile: string | null;
+}
+
+export function parseArgs(input: string):ParsedCommand {
+  const tokens: string[] = [];
   let current = "";
 
   let inSingle = false;
@@ -51,7 +56,7 @@ export function parseArgs(input: string): string[] {
     // argument separator
     if (ch === " " && !inSingle && !inDouble) {
       if (current.length > 0) {
-        args.push(current);
+        tokens.push(current);
         current = "";
       }
       continue;
@@ -61,8 +66,19 @@ export function parseArgs(input: string): string[] {
   }
 
   if (current.length > 0) {
-    args.push(current);
+    tokens.push(current);
   }
 
-  return args;
+  const args: string[] = [];
+  let redirectFile: string | null = null;
+
+  for (let i = 0; i < tokens.length; i++) {
+    if (tokens[i] === ">" || tokens[i] === "1>") {
+      redirectFile = tokens[i + 1];
+      break;
+    }
+    args.push(tokens[i]);
+  }
+
+  return { args, redirectFile };
 }
