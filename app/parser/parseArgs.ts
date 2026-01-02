@@ -1,10 +1,5 @@
-export interface ParsedCommand {
-  args: string[];
-  redirectFile: string | null;
-}
-
-export function parseArgs(input: string):ParsedCommand {
-  const tokens: string[] = [];
+export function parseArgs(input: string): string[] {
+  const args: string[] = [];
   let current = "";
 
   let inSingle = false;
@@ -56,7 +51,7 @@ export function parseArgs(input: string):ParsedCommand {
     // argument separator
     if (ch === " " && !inSingle && !inDouble) {
       if (current.length > 0) {
-        tokens.push(current);
+        args.push(current);
         current = "";
       }
       continue;
@@ -66,19 +61,32 @@ export function parseArgs(input: string):ParsedCommand {
   }
 
   if (current.length > 0) {
-    tokens.push(current);
+    args.push(current);
   }
 
+  return args;
+}
+
+export interface RedirectionResult {
+  args: string[];
+  stdoutFile: string | null;
+}
+
+export function parseRedirection(tokens: string[]): RedirectionResult {
   const args: string[] = [];
-  let redirectFile: string | null = null;
+  let stdoutFile: string | null = null;
 
   for (let i = 0; i < tokens.length; i++) {
-    if (tokens[i] === ">" || tokens[i] === "1>") {
-      redirectFile = tokens[i + 1];
-      break;
+    const t = tokens[i];
+
+    if ((t === ">" || t === "1>") && tokens[i + 1]) {
+      stdoutFile = tokens[i + 1];
+      i++; // skip filename
+      continue;
     }
-    args.push(tokens[i]);
+
+    args.push(t);
   }
 
-  return { args, redirectFile };
+  return { args, stdoutFile };
 }
