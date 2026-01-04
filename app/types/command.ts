@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
 import path from "path";
 import { pathLocateExec } from "../utils/pathLocate";
-import { readFileSync, writeSync } from "fs";
+import { readFileSync } from "fs";
 import { commandNotFound, typeNotFound } from "../utils/notFound";
 import { validTypeCommands } from "../types/validBuiltin";
 

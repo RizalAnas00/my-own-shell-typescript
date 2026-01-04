@@ -81,14 +81,30 @@ export function parseRedirection(tokens: string[]): RedirectionResult {
   for (let i = 0; i < tokens.length; i++) {
     const t = tokens[i];
 
+    // redirect stdout and overwrite / create one
     if ((t === ">" || t === "1>") && tokens[i + 1]) {
       stdoutFile = tokens[i + 1];
       i++;
       continue;
     }
 
-    if (t === "2>" && tokens[i + 1]) {
+    // redirect stdout and append
+    else if (t === ">>" || t === "1>>" && tokens[i + 1]) {
+      stdoutFile = tokens[i + 1];
+      i++;
+      continue;
+    }
+
+    // redirect stderr and overwrite / create one
+    else if (t === "2>" && tokens[i + 1]) {
       stderrFile = tokens[i + 1];
+      i++;
+      continue;
+    }
+
+    // redirect stderr and append
+    else if (t === ">>" || t === "2>>" && tokens[i + 1]) {
+      stdoutFile = stderrFile = tokens[i + 1];
       i++;
       continue;
     }
