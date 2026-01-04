@@ -9,10 +9,15 @@ export function execute(tokens: string[], next: () => void) {
     return;
   }
 
-  const { args, stdoutFile, stderrFile } = parseRedirection(tokens);
+  const { args, stdoutFile, stderrFile, stdoutAppend, stderrAppend } = parseRedirection(tokens);
 
-  const outFd = stdoutFile ? openSync(stdoutFile, "w") : null;
-  const errFd = stderrFile ? openSync(stderrFile, "w") : null;
+  const outFd = stdoutFile
+    ? openSync(stdoutFile, stdoutAppend ? "a" : "w")
+    : null;
+
+  const errFd = stderrFile
+    ? openSync(stderrFile, stderrAppend ? "a" : "w")
+    : null;
 
   if (tryBuiltin(args, outFd, errFd)) {
     if (outFd !== null) closeSync(outFd);

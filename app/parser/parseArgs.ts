@@ -9,20 +9,16 @@ export function parseArgs(input: string): string[] {
   for (let i = 0; i < input.length; i++) {
     const ch = input[i];
 
-    // escape
     if (escaped) {
       current += ch;
       escaped = false;
       continue;
     }
 
-    // backslash
     if (ch === "\\") {
       if (inSingle) {
-        // literal inside single quotes
         current += "\\";
       } else if (inDouble) {
-        // only escape specific chars in double quotes
         const next = input[i + 1];
         if (next === "\\" || next === '"' || next === "$" || next === "`") {
           escaped = true;
@@ -30,25 +26,21 @@ export function parseArgs(input: string): string[] {
           current += "\\";
         }
       } else {
-        // outside quotes = escape anything
         escaped = true;
       }
       continue;
     }
 
-    // single quote
     if (ch === "'" && !inDouble) {
       inSingle = !inSingle;
       continue;
     }
 
-    // double quote
     if (ch === '"' && !inSingle) {
       inDouble = !inDouble;
       continue;
     }
 
-    // argument separator
     if (ch === " " && !inSingle && !inDouble) {
       if (current.length > 0) {
         args.push(current);
@@ -70,41 +62,54 @@ export function parseArgs(input: string): string[] {
 export interface RedirectionResult {
   args: string[];
   stdoutFile: string | null;
+  stdoutAppend: boolean;
   stderrFile: string | null;
+  stderrAppend: boolean;
 }
 
 export function parseRedirection(tokens: string[]): RedirectionResult {
   const args: string[] = [];
+
   let stdoutFile: string | null = null;
   let stderrFile: string | null = null;
+  let stdoutAppend = false;
+  let stderrAppend = false;
 
   for (let i = 0; i < tokens.length; i++) {
     const t = tokens[i];
 
-    // redirect stdout and overwrite / create one
+    /* ---------- STDOUT ---------- */
+
+    // > or 1>
     if ((t === ">" || t === "1>") && tokens[i + 1]) {
       stdoutFile = tokens[i + 1];
+      stdoutAppend = false;
       i++;
       continue;
     }
 
-    // redirect stdout and append
-    else if (t === ">>" || t === "1>>" && tokens[i + 1]) {
+    // >> or 1>>
+    if ((t === ">>" || t === "1>>") && tokens[i + 1]) {
       stdoutFile = tokens[i + 1];
+      stdoutAppend = true;
       i++;
       continue;
     }
 
-    // redirect stderr and overwrite / create one
-    else if (t === "2>" && tokens[i + 1]) {
+    /* ---------- STDERR ---------- */
+
+    // 2>
+    if (t === "2>" && tokens[i + 1]) {
       stderrFile = tokens[i + 1];
+      stderrAppend = false;
       i++;
       continue;
     }
 
-    // redirect stderr and append
-    else if (t === ">>" || t === "2>>" && tokens[i + 1]) {
-      stdoutFile = stderrFile = tokens[i + 1];
+    // 2>>
+    if (t === "2>>" && tokens[i + 1]) {
+      stderrFile = tokens[i + 1];
+      stderrAppend = true;
       i++;
       continue;
     }
@@ -112,5 +117,11 @@ export function parseRedirection(tokens: string[]): RedirectionResult {
     args.push(t);
   }
 
-  return { args, stdoutFile, stderrFile };
+  return {
+    args,
+    stdoutFile,
+    stdoutAppend,
+    stderrFile,
+    stderrAppend
+  };
 }
