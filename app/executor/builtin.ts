@@ -5,39 +5,46 @@ import {
   handleChangeDirectory,
   handleTypeCommand
 } from "../types/command";
+import type { error } from "console";
 
 export function tryBuiltin(
   tokens: string[],
-  fd: number | null
+  stdoutFd: number | null,
+  stderrFd: number | null
 ): boolean {
   const cmd = tokens[0];
   const args = tokens.slice(1);
 
-  const write = (msg: string) => {
-    if (fd !== null) writeSync(fd, msg);
+  const writeOut = (msg: string) => {
+    if (stdoutFd !== null) writeSync(stdoutFd, msg);
+    else print(msg);
+  };
+
+  const writeErr = (msg: string) => {
+    if (stderrFd !== null) writeSync(stderrFd, msg);
     else print(msg);
   };
 
   switch (cmd) {
     case "echo":
-      write(args.join(" ") + "\n");
+      writeOut(args.join(" ") + "\n");
       return true;
 
     case "pwd":
-      write(process.cwd() + "\n");
+      writeOut(process.cwd() + "\n");
       return true;
 
     case "cd":
-      handleChangeDirectory(args);
+      handleChangeDirectory(args, writeErr);
       return true;
 
     case "type":
-      if (!args[0]) write("type: missing operand\n");
-      else handleTypeCommand(args, write);
+      if (!args[0]) writeOut("type: missing operand\n");
+      else handleTypeCommand(args, writeOut);
       return true;
 
     case "cat":
-      handleCatCommand(args, write);
+      handleCatCommand(args, writeOut, writeErr);
       return true;
 
     case "exit":

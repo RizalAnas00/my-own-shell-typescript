@@ -8,7 +8,8 @@ import { validTypeCommands } from "../types/validBuiltin";
 export function handleCustomCommand(
   command: string[],
   loop: () => void,
-  fd: number | null
+  outFd: number | null,
+  errFd: number | null
 ): void {
   const result = pathLocateExec(command);
 
@@ -24,8 +25,8 @@ export function handleCustomCommand(
   const proc = spawn(filename, args, {
     stdio: [
       "inherit",
-      fd !== null ? fd : "inherit",
-      "inherit"
+      outFd !== null ? outFd : "inherit",
+      errFd !== null ? errFd : "inherit"
     ]
   });
 
@@ -33,25 +34,29 @@ export function handleCustomCommand(
   proc.on("error", () => loop());
 }
 
-export function handleChangeDirectory(args: string[]): void {
+export function handleChangeDirectory(
+  args: string[],
+  writeErr: (msg: string) => void
+): void {
   const dir = args[0] || process.env.HOME || "";
   try {
     if (dir === "~") process.chdir(process.env.HOME || "");
     else process.chdir(dir);
   } catch {
-    console.error(`cd: ${dir}: No such file or directory`);
+    writeErr(`cd: ${dir}: No such file or directory\n`);
   }
 }
 
 export function handleCatCommand(
   args: string[],
-  write: (msg: string) => void
+  writeOut: (msg: string) => void,
+  writeErr: (msg: string) => void
 ): void {
   for (const file of args) {
     try {
-      write(readFileSync(file, "utf-8"));
+      writeOut(readFileSync(file, "utf-8"));
     } catch {
-      console.error(`cat: ${file}: No such file or directory`);
+      writeErr(`cat: ${file}: No such file or directory\n`);
     }
   }
 }

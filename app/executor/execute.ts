@@ -9,14 +9,17 @@ export function execute(tokens: string[], next: () => void) {
     return;
   }
 
-  const { args, stdoutFile } = parseRedirection(tokens);
-  const fd = stdoutFile ? openSync(stdoutFile, "w") : null;
+  const { args, stdoutFile, stderrFile } = parseRedirection(tokens);
 
-  if (tryBuiltin(args, fd)) {
-    if (fd !== null) closeSync(fd);
+  const outFd = stdoutFile ? openSync(stdoutFile, "w") : null;
+  const errFd = stderrFile ? openSync(stderrFile, "w") : null;
+
+  if (tryBuiltin(args, outFd, errFd)) {
+    if (outFd !== null) closeSync(outFd);
+    if (errFd !== null) closeSync(errFd);
     next();
     return;
   }
 
-  handleCustomCommand(args, next, fd);
+  handleCustomCommand(args, next, outFd, errFd);
 }

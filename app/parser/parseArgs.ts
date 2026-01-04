@@ -70,23 +70,31 @@ export function parseArgs(input: string): string[] {
 export interface RedirectionResult {
   args: string[];
   stdoutFile: string | null;
+  stderrFile: string | null;
 }
 
 export function parseRedirection(tokens: string[]): RedirectionResult {
   const args: string[] = [];
   let stdoutFile: string | null = null;
+  let stderrFile: string | null = null;
 
   for (let i = 0; i < tokens.length; i++) {
     const t = tokens[i];
 
     if ((t === ">" || t === "1>") && tokens[i + 1]) {
       stdoutFile = tokens[i + 1];
-      i++; // skip filename
+      i++;
+      continue;
+    }
+
+    if (t === "2>" && tokens[i + 1]) {
+      stderrFile = tokens[i + 1];
+      i++;
       continue;
     }
 
     args.push(t);
   }
 
-  return { args, stdoutFile };
+  return { args, stdoutFile, stderrFile };
 }
