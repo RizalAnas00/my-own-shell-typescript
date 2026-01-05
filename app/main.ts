@@ -17,9 +17,15 @@ const rl = createInterface({
       cmd.startsWith(last)
     ).map(cmd => cmd + " ");
 
-    return [hits.length ? hits : validTypeCommands.map(c => c + " "), 
-      last + print('\a')
+    if (!hits.length) {
+      print('\x07'); // bell character
+    }
+
+    return [
+      hits.length ? hits : validTypeCommands.map(c => c + " "),
+      last
     ];
+
   }
 });
 
