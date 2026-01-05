@@ -3,7 +3,7 @@ import { parseArgs } from "./parser/parseArgs";
 import { execute } from "./executor/execute";
 import { validTypeCommands } from "./types/validBuiltin";
 import { print } from "./utils/print";
-import { pathLocateExec } from "./utils/pathLocate";
+import { pathLocateExec, pathCompleteExec } from "./utils/pathLocate";
 
 const rl = createInterface({
   input: process.stdin,
@@ -14,24 +14,19 @@ const rl = createInterface({
     const tokens = parseArgs(line);
     const last = tokens[tokens.length - 1] || "";
 
-    const hits = validTypeCommands.filter(cmd =>
+    const builtinHits = validTypeCommands.filter(cmd =>
       cmd.startsWith(last)
     ).map(cmd => cmd + " ");
 
+    const pathHits = pathCompleteExec(last);
+
+    const hits = [...builtinHits, ...pathHits];
+
     if (!hits.length) {
-      const pathHit = pathLocateExec([last]);
-      if (pathHit) {
-        return [[last + " "], last];
-      } else {
-        print('\x07'); // bell character  
-      }
+      process.stdout.write('\x07'); // bell character
     }
 
-    return [
-      hits.length ? hits : validTypeCommands.map(c => c + " "),
-      last
-    ];
-
+    return [hits, last];
   }
 });
 
