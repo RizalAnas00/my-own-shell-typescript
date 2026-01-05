@@ -3,6 +3,7 @@ import { parseArgs } from "./parser/parseArgs";
 import { execute } from "./executor/execute";
 import { validTypeCommands } from "./types/validBuiltin";
 import { print } from "./utils/print";
+import { pathLocateExec } from "./utils/pathLocate";
 
 const rl = createInterface({
   input: process.stdin,
@@ -18,7 +19,12 @@ const rl = createInterface({
     ).map(cmd => cmd + " ");
 
     if (!hits.length) {
-      print('\x07'); // bell character
+      const pathHit = pathLocateExec([last]);
+      if (pathHit) {
+        return [[last + " "], last];
+      } else {
+        print('\x07'); // bell character  
+      }
     }
 
     return [
