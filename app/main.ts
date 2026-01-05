@@ -16,7 +16,7 @@ const rl = createInterface({
       cmd.startsWith(last)
     );
 
-    return [hits.length ? hits : validTypeCommands, last];
+    return [hits.length ? hits : validTypeCommands + " ", last];
   }
 });
 
