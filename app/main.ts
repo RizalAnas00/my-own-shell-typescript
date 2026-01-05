@@ -2,6 +2,7 @@ import { createInterface } from "readline";
 import { parseArgs } from "./parser/parseArgs";
 import { execute } from "./executor/execute";
 import { validTypeCommands } from "./types/validBuiltin";
+import { print } from "./utils/print";
 
 const rl = createInterface({
   input: process.stdin,
@@ -16,7 +17,9 @@ const rl = createInterface({
       cmd.startsWith(last)
     ).map(cmd => cmd + " ");
 
-    return [hits.length ? hits : validTypeCommands.map(c => c + " "), last];
+    return [hits.length ? hits : validTypeCommands.map(c => c + " "), 
+      last + print('\a')
+    ];
   }
 });
 
