@@ -8,17 +8,17 @@ const rl = createInterface({
   input: process.stdin,
   output: process.stdout,
   terminal: false,
+  completer: (line: string) => {
+    const tokens = parseArgs(line);
+    const hits = validTypeCommands.filter(c =>
+      c.startsWith(tokens[0] || "")
+    );
+    return [hits.length ? hits : validTypeCommands, line];
+  }
 });
 
 function loop() {
   print("$ ");
-
-  rl.on('line', (line) => {
-    const tokens = parseArgs(line.trim());
-    const hints = validTypeCommands.filter(cmd => cmd.startsWith(tokens[0] || ""));
-    
-    return [hints.length ? hints : validTypeCommands, line];
-  });
 
   rl.question("", (line) => {
     const tokens = parseArgs(line.trim());
