@@ -14,9 +14,9 @@ const rl = createInterface({
 
     const hits = validTypeCommands.filter(cmd =>
       cmd.startsWith(last)
-    );
+    ).map(cmd => cmd + " ");
 
-    return [hits.length ? hits : validTypeCommands.map(cmd => cmd + " "), last];
+    return [hits.length ? hits : validTypeCommands.map(c => c + " "), last];
   }
 });
 
