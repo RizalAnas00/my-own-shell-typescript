@@ -42,7 +42,7 @@ const rl = createInterface({
     const lcp = longestCommonPrefix(hits);
     if (lcp.length > last.length) {
       tabPressedCount = 0;
-      return [[lcp + " "], line];
+      return [[lcp], line];
     }
 
     // multiple matches
