@@ -31,19 +31,17 @@ const rl = createInterface({
     }
     tabPressCount++;
 
-    if (tabPressCount === 1) {
-      if (!hits.length) {
+    if (!hits.length) {
+      if (tabPressCount === 1) {
         process.stdout.write('\x07'); // bell character on first TAB if no matches
       }
     } else if (tabPressCount === 2) {
-      if (hits.length) {
-        // Sort hits alphabetically and display
-        const sorted = hits.map(h => h.trim()).sort().join("  ");
-        process.stdout.write(`\n${sorted}\n`);
-        // Show prompt again with the original command prefix
-        process.stdout.write(rl.prompt.toString());
-        process.stdout.write(line);
-      }
+      // Sort hits alphabetically and display
+      const sorted = hits.map(h => h.trim()).sort().join("  ");
+      process.stdout.write(`\n${sorted}\n`);
+      // Show prompt again with the original command prefix
+      process.stdout.write(rl.prompt.toString());
+      process.stdout.write(line);
     }
 
     return [hits, last];
