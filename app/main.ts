@@ -4,8 +4,7 @@ import { execute } from "./executor/execute";
 import { validTypeCommands } from "./types/validBuiltin";
 import { pathCompleteExec } from "./utils/pathLocate";
 
-let lastLine = "";
-let tabPressCount = 0;
+let tabPressedCount = 0;
 
 const rl = createInterface({
   input: process.stdin,
@@ -24,27 +23,24 @@ const rl = createInterface({
 
     const hits = [...builtinHits, ...pathHits];
 
-    // Track TAB presses for the same line
-    if (line !== lastLine) {
-      tabPressCount = 0;
-      lastLine = line;
-    }
-    tabPressCount++;
-
     if (!hits.length) {
-      if (tabPressCount === 1) {
-        process.stdout.write('\x07'); // bell character on first TAB if no matches
-      }
-    } else if (tabPressCount === 2) {
-      // Sort hits alphabetically and display
-      const sorted = hits.map(h => h.trim()).sort().join("  ");
-      process.stdout.write(`\n${sorted}\n`);
-      // Show prompt again with the original command prefix
-      process.stdout.write(rl.prompt.toString());
-      process.stdout.write(line);
+      process.stdout.write('\x07'); // bell character
+    } 
+    
+    if (hits.length >= 1) {
+      return [hits, last];    
     }
 
-    return [hits, last];
+    if (tabPressedCount == 0) {
+      tabPressedCount++;
+
+      process.stdout.write('\x07');
+      return hits;
+    } else if (tabPressedCount >= 1) {
+      tabPressedCount = 0;
+      process.stdout.write(`\n${hits.join(" ")}\n$ ${line}`);
+    }
+
   }
 });
 
