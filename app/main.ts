@@ -2,8 +2,10 @@ import { createInterface } from "readline";
 import { parseArgs } from "./parser/parseArgs";
 import { execute } from "./executor/execute";
 import { validTypeCommands } from "./types/validBuiltin";
-import { print } from "./utils/print";
-import { pathLocateExec, pathCompleteExec } from "./utils/pathLocate";
+import { pathCompleteExec } from "./utils/pathLocate";
+
+let lastLine = "";
+let tabPressCount = 0;
 
 const rl = createInterface({
   input: process.stdin,
@@ -22,8 +24,26 @@ const rl = createInterface({
 
     const hits = [...builtinHits, ...pathHits];
 
-    if (!hits.length) {
-      process.stdout.write('\x07'); // bell character
+    // Track TAB presses for the same line
+    if (line !== lastLine) {
+      tabPressCount = 0;
+      lastLine = line;
+    }
+    tabPressCount++;
+
+    if (tabPressCount === 1) {
+      if (!hits.length) {
+        process.stdout.write('\x07'); // bell character on first TAB if no matches
+      }
+    } else if (tabPressCount === 2) {
+      if (hits.length) {
+        // Sort hits alphabetically and display
+        const sorted = hits.map(h => h.trim()).sort().join("  ");
+        process.stdout.write(`\n${sorted}\n`);
+        // Show prompt again with the original command prefix
+        process.stdout.write(rl.prompt.toString());
+        process.stdout.write(line);
+      }
     }
 
     return [hits, last];
