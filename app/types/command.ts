@@ -1,4 +1,4 @@
-import { spawn } from "child_process";
+import { ChildProcess, spawn } from "child_process";
 import path from "path";
 import { pathLocateExec } from "../utils/pathLocate";
 import { readFileSync } from "fs";
@@ -11,7 +11,7 @@ export function handleCustomCommand(
   outFd: number | null,
   errFd: number | null
 ): void {
-  const result = pathLocateExec(command);
+  const result: string | null = pathLocateExec(command);
 
   if (!result) {
     commandNotFound(command[0]);
@@ -19,10 +19,10 @@ export function handleCustomCommand(
     return;
   }
 
-  const filename = path.basename(result);
-  const args = command.slice(1);
+  const filename: string = path.basename(result);
+  const args: string[] = command.slice(1);
 
-  const proc = spawn(filename, args, {
+  const proc: ChildProcess = spawn(filename, args, {
     stdio: [
       "inherit",
       outFd !== null ? outFd : "inherit",
@@ -38,7 +38,7 @@ export function handleChangeDirectory(
   args: string[],
   writeErr: (msg: string) => void
 ): void {
-  const dir = args[0] || process.env.HOME || "";
+  const dir: string = args[0] || process.env.HOME || "";
   try {
     if (dir === "~") process.chdir(process.env.HOME || "");
     else process.chdir(dir);
@@ -65,7 +65,7 @@ export function handleTypeCommand(
   args: string[],
   write: (msg: string) => void
 ): void {
-  const cmd = args[0];
+  const cmd: string = args[0];
 
   if (validTypeCommands.includes(cmd)) {
     write(`${cmd} is a shell builtin\n`);

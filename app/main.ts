@@ -6,7 +6,7 @@ import { pathCompleteExec } from "./utils/pathLocate";
 import { print } from "./utils/print";
 import longestCommonPrefix from "./utils/lcp";
 
-let tabPressedCount = 0;
+let tabPressedCount: number= 0;
 
 const rl = createInterface({
   input: process.stdin,
@@ -14,16 +14,16 @@ const rl = createInterface({
   terminal: true,
   prompt: "$ ",
   completer: (line: string) => {
-    const tokens = parseArgs(line);
-    const last = tokens[tokens.length - 1] || "";
+    const tokens: string[] = parseArgs(line);
+    const last: string = tokens[tokens.length - 1] || "";
 
-    const builtinHits = validTypeCommands
+    const builtinHits: string[] = validTypeCommands
     .filter(cmd => cmd.startsWith(last))
     .map(cmd => cmd.trim());
 
-    const pathHits = pathCompleteExec(last).map(c => c.trim());
+    const pathHits: string[] = pathCompleteExec(last).map(c => c.trim());
 
-    const hits = [...new Set([...builtinHits, ...pathHits])].sort();
+    const hits: string[] = [...new Set([...builtinHits, ...pathHits])].sort();
 
     // no matches → bell
     if (hits.length === 0) {
@@ -39,7 +39,7 @@ const rl = createInterface({
     }
 
     // multiple matches with longest common prefix (partial completion)
-    const lcp = longestCommonPrefix(hits);
+    const lcp: string = longestCommonPrefix(hits);
     if (lcp.length > last.length) {
       tabPressedCount = 0;
       return [[lcp], line];
