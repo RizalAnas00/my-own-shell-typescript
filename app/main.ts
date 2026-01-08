@@ -17,30 +17,35 @@ const rl = createInterface({
 
     const builtinHits = validTypeCommands.filter(cmd =>
       cmd.startsWith(last)
-    ).map(cmd => cmd + " ");
+    );
 
     const pathHits = pathCompleteExec(last);
+    const hits = [...new Set([...builtinHits, ...pathHits])].sort();
 
-    const hits = [...builtinHits, ...pathHits];
-
-    if (!hits.length) {
-      process.stdout.write('\x07'); // bell character
-    } 
-    
-    if (hits.length >= 1) {
-      return [hits, last];    
-    }
-
-    if (tabPressedCount == 0) {
-      tabPressedCount++;
-
-      process.stdout.write('\x07');
-      return hits;
-    } else if (tabPressedCount >= 1) {
+    // no matches → bell
+    if (hits.length === 0) {
       tabPressedCount = 0;
-      process.stdout.write(`\n${hits.join(" ")}\n$ ${line}`);
+      process.stdout.write('\x07');
+      return [[], line];
     }
 
+    // single match → autocomplete
+    if (hits.length === 1) {
+      tabPressedCount = 0;
+      return [[hits[0] + " "], line];
+    }
+
+    // multiple matches
+    if (tabPressedCount === 0) {
+      tabPressedCount++;
+      process.stdout.write('\x07');
+      return [[], line];
+    }
+
+    // second tab
+    tabPressedCount = 0;
+    process.stdout.write(`\n${hits.join("  ")}\n$ ${line}`);
+    return [[], line];
   }
 });
 
