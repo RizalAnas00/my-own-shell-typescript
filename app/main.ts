@@ -3,6 +3,7 @@ import { parseArgs } from "./parser/parseArgs";
 import { execute } from "./executor/execute";
 import { validTypeCommands } from "./types/validBuiltin";
 import { pathCompleteExec } from "./utils/pathLocate";
+import { print } from "./utils/print";
 
 let tabPressedCount = 0;
 
@@ -26,7 +27,7 @@ const rl = createInterface({
     // no matches → bell
     if (hits.length === 0) {
       tabPressedCount = 0;
-      process.stdout.write('\x07');
+      print('\x07');
       return [[], line];
     }
 
@@ -39,13 +40,13 @@ const rl = createInterface({
     // multiple matches
     if (tabPressedCount === 0) {
       tabPressedCount++;
-      process.stdout.write('\x07');
+      print('\x07');
       return [[], line];
     }
 
     // second tab
     tabPressedCount = 0;
-    process.stdout.write(`\n${hits.join("  ")}\n$ ${line}`);
+    print(`\n${hits.join("  ")}\n$ ${line}`);
     return [[], line];
   }
 });
