@@ -15,11 +15,12 @@ const rl = createInterface({
     const tokens = parseArgs(line);
     const last = tokens[tokens.length - 1] || "";
 
-    const builtinHits = validTypeCommands.filter(cmd =>
-      cmd.startsWith(last)
-    );
+    const builtinHits = validTypeCommands
+    .filter(cmd => cmd.startsWith(last))
+    .map(cmd => cmd.trim());
 
-    const pathHits = pathCompleteExec(last);
+    const pathHits = pathCompleteExec(last).map(c => c.trim());
+
     const hits = [...new Set([...builtinHits, ...pathHits])].sort();
 
     // no matches → bell
@@ -50,6 +51,7 @@ const rl = createInterface({
 });
 
 rl.on("line", (line) => {
+  tabPressedCount = 0;
   const tokens = parseArgs(line.trim());
   execute(tokens, () => rl.prompt());
 });
