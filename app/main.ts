@@ -4,6 +4,7 @@ import { execute } from "./executor/execute";
 import { validTypeCommands } from "./types/validBuiltin";
 import { pathCompleteExec } from "./utils/pathLocate";
 import { print } from "./utils/print";
+import longestCommonPrefix from "./utils/lcp";
 
 let tabPressedCount = 0;
 
@@ -35,6 +36,12 @@ const rl = createInterface({
     if (hits.length === 1) {
       tabPressedCount = 0;
       return [[hits[0] + " "], line];
+    }
+
+    const lcp = longestCommonPrefix(hits);
+    if (lcp.length > last.length) {
+      tabPressedCount = 0;
+      return [[lcp + " "], line];
     }
 
     // multiple matches
