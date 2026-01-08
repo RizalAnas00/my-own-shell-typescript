@@ -38,6 +38,7 @@ const rl = createInterface({
       return [[hits[0] + " "], line];
     }
 
+    // multiple matches with longest common prefix (partial completion)
     const lcp = longestCommonPrefix(hits);
     if (lcp.length > last.length) {
       tabPressedCount = 0;
