@@ -7,8 +7,8 @@ export const validTypeCommands: string[] = [
   "tail",
   "wc",
   "head",
-  "cat",
-  "ls",
+  // "cat",
+  // "ls",
   "history",
 ];
 
