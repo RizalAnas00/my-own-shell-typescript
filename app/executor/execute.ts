@@ -4,6 +4,11 @@ import { parseRedirection } from "../parser/parseArgs";
 import { openSync, closeSync } from "fs";
 import executePipeline from "./pipeline";
 
+import {
+  PIPELINE_SAFE_BUILTINS,
+  STATEFUL_BUILTINS,
+} from "../types/validBuiltin";
+
 export function execute(tokens: string[], next: () => void) {
   if (!tokens.length) return next();
 
@@ -26,12 +31,56 @@ export function execute(tokens: string[], next: () => void) {
     ? openSync(stderrFile, stderrAppend ? "a" : "w")
     : null;
 
-  if (!isPipeline && tryBuiltin(pipelineParts[0], outFd, errFd)) {
+  // -------------- NO PIPELINE -> NORMAL -------------- //
+  if (!isPipeline) {
+    if (tryBuiltin(pipelineParts[0], outFd, errFd)) {
+      outFd && closeSync(outFd);
+      errFd && closeSync(errFd);
+      return next();
+    }
+
+    executePipeline(
+      pipelineParts,
+      outFd,
+      errFd,
+      () => {
+        outFd && closeSync(outFd);
+        errFd && closeSync(errFd);
+        next();
+      }
+    );
+    return;
+  }
+
+  // -------------- PIPELINE -------------- //
+
+  const last = pipelineParts[pipelineParts.length - 1];
+  const lastCmd = last[0];
+
+  // if Stateful builtin inside pipeline then ignore as builtin
+  if (STATEFUL_BUILTINS.has(lastCmd)) {
+    executePipeline(
+      pipelineParts,
+      outFd,
+      errFd,
+      () => {
+        outFd && closeSync(outFd);
+        errFd && closeSync(errFd);
+        next();
+      }
+    );
+    return;
+  }
+
+  // Pipeline-safe builtin at LAST position
+  if (PIPELINE_SAFE_BUILTINS.has(lastCmd)) {
+    tryBuiltin(last, outFd, errFd);
     outFd && closeSync(outFd);
     errFd && closeSync(errFd);
     return next();
   }
 
+  // Default: full external pipeline
   executePipeline(
     pipelineParts,
     outFd,
