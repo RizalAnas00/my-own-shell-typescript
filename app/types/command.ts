@@ -76,9 +76,9 @@ export function handleTypeCommand(
 export function handleHistoryCommand(args: string[], write: (msg: string) => void): void {
   addHistory(`history ${args.join(" ")}`);
   const histories = getAllHistory();
-
+  
   for (let i: number = 0; i < histories.length; i++) {
-    if(isNumberObject(args[0]) && Number(args[0]) >= 0 && Number(args[0]) < i+1) {
+    if(isNumberObject(Number(args[0])) && Number(args[0]) >= 0 && Number(args[0]) < i+1) {
       write(`    ${i+1}  ${histories[i]}\n`);
     }
   }
