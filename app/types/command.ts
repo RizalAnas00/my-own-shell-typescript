@@ -77,9 +77,10 @@ export function handleHistoryCommand(args: string[], write: (msg: string) => voi
   addHistory(`history ${args.join(" ")}`);
   const histories = getAllHistory();
   const limit = args[0] ? Number(args[0]) : 0;
-  
+
   for (let i: number = 0; i < histories.length; i++) {
-    if (isNumberObject(limit) && i >= limit) break;
-    write(`    ${i + 1}  ${histories[i]}\n`);
+    if (isNumberObject(limit) && i+1 > limit){
+      write(`    ${i+1}  ${histories[i]}\n`);
+    }
   }
 }
