@@ -5,6 +5,7 @@ import { readFileSync } from "fs";
 import { commandNotFound, typeNotFound } from "../utils/notFound";
 import { validTypeCommands } from "../types/validBuiltin";
 import { spawnCommand } from "../executor/spawnCommand";
+import { getAllHistory } from "../utils/history";
 
 export function handleCustomCommand(
   command: string[],
@@ -72,7 +73,9 @@ export function handleTypeCommand(
 
 // handle history command
 export function handleHistoryCommand(args: string[], write: (msg: string) => void): void {
-  const historyFile = path.join(process.env.HOME || "", ".bash_history");
-  const history = readFileSync(historyFile, "utf-8");
-  write(history);
+  const histories = getAllHistory();
+
+  for (let i: number = 1; i < histories.length; i++) {
+    write(`${i} ${histories[i]}\n`);
+  }
 }

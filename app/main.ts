@@ -5,6 +5,7 @@ import { validTypeCommands } from "./types/validBuiltin";
 import { pathCompleteExec } from "./utils/pathLocate";
 import { print } from "./utils/print";
 import longestCommonPrefix from "./utils/lcp";
+import { addHistory } from "./utils/history";
 
 let tabPressedCount: number= 0;
 
@@ -62,7 +63,12 @@ const rl = createInterface({
 rl.on("line", (line) => {
   tabPressedCount = 0;
   const tokens = parseArgs(line.trim());
-  execute(tokens, () => rl.prompt());
+  execute(tokens, () => toHistory(line, () => rl.prompt()));
 });
 
 rl.prompt();
+
+function toHistory(line: string, prompt: () => void): void {
+  addHistory(line);
+  prompt();
+}
