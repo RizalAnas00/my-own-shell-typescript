@@ -12,10 +12,6 @@ export const validTypeCommands: string[] = [
 export const PIPELINE_SAFE_BUILTINS = new Set([
   "pwd",
   "type",
-  "cat",
-  "head",
-  "tail",
-  "wc",
 ]);
 
 export const STATEFUL_BUILTINS = new Set([
