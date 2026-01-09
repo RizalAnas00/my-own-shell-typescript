@@ -81,6 +81,6 @@ export function handleHistoryCommand(args: string[], write: (msg: string) => voi
   const start = Math.max(0, histories.length - limit);
 
   for (let i = start; i < histories.length; i++) {
-    write(`    ${i + 1}  ${histories[i]}\n`);
+    write(`    ${i}  ${histories[i]}\n`);
   }
 }
