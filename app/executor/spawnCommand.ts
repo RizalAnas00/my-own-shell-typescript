@@ -9,5 +9,5 @@ export function spawnCommand(
   const fullPath = pathLocateExec(command);
   if (!fullPath) return null;
 
-  return spawn(fullPath, command.slice(1), { stdio });
+  return spawn(fullPath, command.slice(1), { stdio, argv0: command[0] });
 }
