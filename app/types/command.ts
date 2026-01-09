@@ -76,6 +76,6 @@ export function handleHistoryCommand(args: string[], write: (msg: string) => voi
   const histories = getAllHistory();
 
   for (let i: number = 1; i < histories.length; i++) {
-    write(`${i} ${histories[i]}\n`);
+    write(`    ${i}  ${histories[i]}\n`);
   }
 }
