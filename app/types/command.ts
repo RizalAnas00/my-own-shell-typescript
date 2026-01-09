@@ -6,6 +6,7 @@ import { commandNotFound, typeNotFound } from "../utils/notFound";
 import { validTypeCommands } from "../types/validBuiltin";
 import { spawnCommand } from "../executor/spawnCommand";
 import { addHistory, getAllHistory } from "../utils/history";
+import { isNumberObject } from "util/types";
 
 export function handleCustomCommand(
   command: string[],
@@ -73,10 +74,12 @@ export function handleTypeCommand(
 
 // handle history command
 export function handleHistoryCommand(args: string[], write: (msg: string) => void): void {
-  addHistory("history");
+  addHistory(`history ${args.join(" ")}`);
   const histories = getAllHistory();
 
   for (let i: number = 0; i < histories.length; i++) {
-    write(`    ${i+1}  ${histories[i]}\n`);
+    if(isNumberObject(args[0]) && Number(args[0]) >= 0 && Number(args[0]) < i+1) {
+      write(`    ${i+1}  ${histories[i]}\n`);
+    }
   }
 }
