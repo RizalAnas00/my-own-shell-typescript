@@ -4,4 +4,7 @@ export const validTypeCommands: string[] = [
   "exit", 
   "pwd",
   "cd",
+  "tail",
+  "wc",
+  "head"
 ];

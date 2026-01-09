@@ -4,6 +4,7 @@ import { pathLocateExec } from "../utils/pathLocate";
 import { readFileSync } from "fs";
 import { commandNotFound, typeNotFound } from "../utils/notFound";
 import { validTypeCommands } from "../types/validBuiltin";
+import { spawnCommand } from "../executor/spawnCommand";
 
 export function handleCustomCommand(
   command: string[],
@@ -11,27 +12,19 @@ export function handleCustomCommand(
   outFd: number | null,
   errFd: number | null
 ): void {
-  const result: string | null = pathLocateExec(command);
+  const proc = spawnCommand(command, [
+    "inherit",
+    outFd ?? "inherit",
+    errFd ?? "inherit"
+  ]);
 
-  if (!result) {
+  if (!proc) {
     commandNotFound(command[0]);
-    loop();
-    return;
+    return loop();
   }
 
-  const filename: string = path.basename(result);
-  const args: string[] = command.slice(1);
-
-  const proc: ChildProcess = spawn(filename, args, {
-    stdio: [
-      "inherit",
-      outFd !== null ? outFd : "inherit",
-      errFd !== null ? errFd : "inherit"
-    ]
-  });
-
-  proc.on("exit", () => loop());
-  proc.on("error", () => loop());
+  proc.on("exit", loop);
+  proc.on("error", loop);
 }
 
 export function handleChangeDirectory(
@@ -75,4 +68,24 @@ export function handleTypeCommand(
   const result = pathLocateExec([cmd]);
   if (result) write(`${cmd} is ${result}\n`);
   else typeNotFound(cmd);
+}
+
+// command: wc
+// stands for word count and is used to count the number of 
+// lines, words, characters, and bytes in a specified file 
+// or from standard input. 
+export function handleWcCommand(args: string[], write: (msg: string) => void): void {
+  // TODO
+}
+
+// command: head
+// is used to print the first few lines of a file. 
+export function handleHeadCommand(args: string[], write: (msg: string) => void): void {
+  // TODO
+}
+
+// command: tail
+// is used to print the last few lines of a file. 
+export function handleTailCommand(args: string[], write: (msg: string) => void): void {
+  // TODO
 }
