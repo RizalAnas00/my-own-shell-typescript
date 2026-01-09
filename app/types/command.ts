@@ -5,7 +5,7 @@ import { readFileSync } from "fs";
 import { commandNotFound, typeNotFound } from "../utils/notFound";
 import { validTypeCommands } from "../types/validBuiltin";
 import { spawnCommand } from "../executor/spawnCommand";
-import { getAllHistory } from "../utils/history";
+import { addHistory, getAllHistory } from "../utils/history";
 
 export function handleCustomCommand(
   command: string[],
@@ -73,6 +73,7 @@ export function handleTypeCommand(
 
 // handle history command
 export function handleHistoryCommand(args: string[], write: (msg: string) => void): void {
+  addHistory("history");
   const histories = getAllHistory();
 
   for (let i: number = 0; i < histories.length; i++) {
