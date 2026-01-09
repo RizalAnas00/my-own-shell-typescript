@@ -7,11 +7,16 @@ import executePipeline from "./pipeline";
 export function execute(tokens: string[], next: () => void) {
   if (!tokens.length) return next();
 
-  const pipelineParts = splitPipeline(tokens);
-  const isPipeline = pipelineParts.length > 1;
+  const {
+    args,
+    stdoutFile,
+    stderrFile,
+    stdoutAppend,
+    stderrAppend,
+  } = parseRedirection(tokens);
 
-  const { args, stdoutFile, stderrFile, stdoutAppend, stderrAppend } =
-    parseRedirection(tokens);
+  const pipelineParts = splitPipeline(args);
+  const isPipeline = pipelineParts.length > 1;
 
   const outFd = stdoutFile
     ? openSync(stdoutFile, stdoutAppend ? "a" : "w")
@@ -21,8 +26,7 @@ export function execute(tokens: string[], next: () => void) {
     ? openSync(stderrFile, stderrAppend ? "a" : "w")
     : null;
 
-  // builtin hanya boleh kalau BUKAN pipeline
-  if (!isPipeline && tryBuiltin(args, outFd, errFd)) {
+  if (!isPipeline && tryBuiltin(pipelineParts[0], outFd, errFd)) {
     outFd && closeSync(outFd);
     errFd && closeSync(errFd);
     return next();
