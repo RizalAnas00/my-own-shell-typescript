@@ -3,6 +3,7 @@ import { print } from "../utils/print";
 import {
   handleCatCommand,
   handleChangeDirectory,
+  handleHistoryCommand,
   handleTypeCommand
 } from "../types/command";
 import type { error } from "console";
@@ -45,6 +46,10 @@ export function tryBuiltin(
 
     case "cat":
       handleCatCommand(args, writeOut, writeErr);
+      return true;
+
+    case "history":
+      handleHistoryCommand(args, writeOut);
       return true;
 
     case "exit":
