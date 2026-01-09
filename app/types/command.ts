@@ -70,22 +70,9 @@ export function handleTypeCommand(
   else typeNotFound(cmd);
 }
 
-// command: wc
-// stands for word count and is used to count the number of 
-// lines, words, characters, and bytes in a specified file 
-// or from standard input. 
-export function handleWcCommand(args: string[], write: (msg: string) => void): void {
-  // TODO
-}
-
-// command: head
-// is used to print the first few lines of a file. 
-export function handleHeadCommand(args: string[], write: (msg: string) => void): void {
-  // TODO
-}
-
-// command: tail
-// is used to print the last few lines of a file. 
-export function handleTailCommand(args: string[], write: (msg: string) => void): void {
-  // TODO
+// handle history command
+export function handleHistoryCommand(args: string[], write: (msg: string) => void): void {
+  const historyFile = path.join(process.env.HOME || "", ".bash_history");
+  const history = readFileSync(historyFile, "utf-8");
+  write(history);
 }

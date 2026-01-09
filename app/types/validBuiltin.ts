@@ -6,7 +6,10 @@ export const validTypeCommands: string[] = [
   "cd",
   "tail",
   "wc",
-  "head"
+  "head",
+  "cat",
+  "ls",
+  "history",
 ];
 
 export const PIPELINE_SAFE_BUILTINS = new Set([
