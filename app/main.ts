@@ -63,12 +63,12 @@ const rl = createInterface({
 rl.on("line", (line) => {
   tabPressedCount = 0;
   const tokens = parseArgs(line.trim());
-  execute(tokens, () => toHistory(line, () => rl.prompt()));
+  execute(tokens, () => rl.prompt());
 });
 
 rl.prompt();
 
-function toHistory(line: string, prompt: () => void): void {
-  addHistory(line);
-  prompt();
-}
+// function toHistory(line: string, prompt: () => void): void {
+//   addHistory(line);
+//   prompt();
+// }
