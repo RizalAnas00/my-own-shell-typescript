@@ -90,7 +90,10 @@ export function handleHistoryCommand(args: string[], write: (msg: string) => voi
 
     return;
   } else if (args[0] === "-w") {
-    writeFileSync(args[1], getAllHistory().join("\n") + "\n");
+    addHistory(`history ${args.join(" ")}`);
+
+    const histories = getAllHistory();
+    writeFileSync(args[1], histories.join("\n") + "\n");
     return;
   } else {
     addHistory(`history ${args.join(" ")}`);
