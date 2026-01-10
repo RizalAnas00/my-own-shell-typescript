@@ -1,4 +1,4 @@
-import { appendFileSync } from "fs";
+import { readFileSync } from "fs";
 import path from "path";
 
 export let historyCommands: string[] = [];
@@ -14,5 +14,15 @@ export function clearHistory(): void {
 }
 
 export function getAllHistory(): string[] {
-    return historyCommands;
+    let allHistories: string[] = [];
+    const HISTPATH = path.join(process.env.HOME || "", ".bash_history");
+    try {
+        const content = readFileSync(HISTPATH, "utf-8");
+        allHistories = content.split("\n");
+    } catch {
+        // ignore
+    }
+
+    new Array(historyCommands.length).fill("").map((_, i) => allHistories.push(historyCommands[i]));
+    return allHistories;
 }
