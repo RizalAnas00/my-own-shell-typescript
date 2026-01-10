@@ -78,6 +78,7 @@ export function handleHistoryCommand(
   write: (msg: string) => void
 ): void {
   const opt = args[0];
+  let lastHistoryWriteIndex = 0;
 
   switch (opt) {
     case "-r": {
@@ -101,6 +102,7 @@ export function handleHistoryCommand(
 
       const histories = getAllHistory();
       writeFileSync(args[1], histories.join("\n") + "\n");
+      lastHistoryWriteIndex = histories.length;
       return;
     }
 
@@ -108,8 +110,12 @@ export function handleHistoryCommand(
       addHistory(`history ${args.join(" ")}`);
 
       const histories = getAllHistory();
-      const data = histories.join("\n") + "\n";
-      appendFileSync(args[1], data);
+      const newEntries = histories.slice(lastHistoryWriteIndex);
+
+      if (newEntries.length > 0) {
+        appendFileSync(args[1], newEntries.join("\n") + "\n");
+        lastHistoryWriteIndex = histories.length;
+      }
       return;
     }
 
