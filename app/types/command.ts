@@ -1,7 +1,7 @@
 import { ChildProcess, spawn } from "child_process";
 import path from "path";
 import { pathLocateExec } from "../utils/pathLocate";
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { commandNotFound, typeNotFound } from "../utils/notFound";
 import { validTypeCommands } from "../types/validBuiltin";
 import { spawnCommand } from "../executor/spawnCommand";
@@ -88,6 +88,9 @@ export function handleHistoryCommand(args: string[], write: (msg: string) => voi
       }
     }
 
+    return;
+  } else if (args[0] === "-w") {
+    writeFileSync(args[1], getAllHistory().join("\n"));
     return;
   } else {
     addHistory(`history ${args.join(" ")}`);
