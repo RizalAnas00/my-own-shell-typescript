@@ -69,6 +69,7 @@ rl.on("line", (line) => {
 rl.prompt();
 
 function toHistory(line: string, prompt: () => void): void {
+  if(line.startsWith("history")) return prompt();
   addHistory(line);
   prompt();
 }
