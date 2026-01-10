@@ -75,6 +75,7 @@ export function handleTypeCommand(
 // handle history command
 export function handleHistoryCommand(args: string[], write: (msg: string) => void): void {
   if (args[0] === "-r") {
+    addHistory(`history ${args.join(" ")}`);
     const files = args.slice(1);
 
     for (const f of files) {
@@ -87,11 +88,10 @@ export function handleHistoryCommand(args: string[], write: (msg: string) => voi
       }
     }
 
-    addHistory(`history ${args.join(" ")}`);
     return;
+  } else {
+    addHistory(`history ${args.join(" ")}`);
   }
-
-  addHistory(`history ${args.join(" ")}`);
 
   const histories = getAllHistory();
   const limit = args[0] ? Number(args[0]) : histories.length;
