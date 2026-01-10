@@ -77,9 +77,14 @@ export function handleHistoryCommand(args: string[], write: (msg: string) => voi
   let histories: string[] = [];
   if (args[0] === "-r") {
     addHistory(`history ${args.join(" ")}`);
+    let histFiles: string[] = [];
     for(let i: number = 0; i < args.slice(1).length; i++) {
       const file: string = readFileSync(args[i + 1], "utf-8");
-      addHistory(file);
+      histFiles.push(...file.split("\n"));
+    }
+
+    for (let i = 0; i < histFiles.length; i++) {
+      addHistory(histFiles[i]);
     }
   }
     
