@@ -76,14 +76,14 @@ export function handleTypeCommand(
 export function handleHistoryCommand(args: string[], write: (msg: string) => void): void {
   let histories: string[] = [];
   if (args[0] === "-r") {
+    addHistory(`history ${args.join(" ")}`);
     for(let i: number = 0; i < args.slice(1).length; i++) {
       const file: string = readFileSync(args[i + 1], "utf-8");
       addHistory(file);
     }
-  } else {
-    addHistory(`history ${args.join(" ")}`);
   }
-  // addHistory(`history ${args.join(" ")}`);
+    
+  addHistory(`history ${args.join(" ")}`);
   histories = getAllHistory();
   const limit = args[0] ? Number(args[0]) : histories.length;
   
