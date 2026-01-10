@@ -8,6 +8,8 @@ import { spawnCommand } from "../executor/spawnCommand";
 import { addHistory, getAllHistory } from "../utils/history";
 import { isNumberObject } from "util/types";
 
+let lastHistoryWriteIndex = 0;
+
 export function handleCustomCommand(
   command: string[],
   loop: () => void,
@@ -78,7 +80,6 @@ export function handleHistoryCommand(
   write: (msg: string) => void
 ): void {
   const opt = args[0];
-  let lastHistoryWriteIndex = 0;
 
   switch (opt) {
     case "-r": {
