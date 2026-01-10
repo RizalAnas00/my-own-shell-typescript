@@ -1,7 +1,7 @@
 import { ChildProcess, spawn } from "child_process";
 import path from "path";
 import { pathLocateExec } from "../utils/pathLocate";
-import { readFileSync, writeFileSync } from "fs";
+import { appendFileSync, readFileSync, writeFileSync } from "fs";
 import { commandNotFound, typeNotFound } from "../utils/notFound";
 import { validTypeCommands } from "../types/validBuiltin";
 import { spawnCommand } from "../executor/spawnCommand";
@@ -73,34 +73,52 @@ export function handleTypeCommand(
 }
 
 // handle history command
-export function handleHistoryCommand(args: string[], write: (msg: string) => void): void {
-  if (args[0] === "-r") {
-    addHistory(`history ${args.join(" ")}`);
-    const files = args.slice(1);
+export function handleHistoryCommand(
+  args: string[],
+  write: (msg: string) => void
+): void {
+  const opt = args[0];
 
-    for (const f of files) {
-      const content = readFileSync(f, "utf-8");
+  switch (opt) {
+    case "-r": {
+      addHistory(`history ${args.join(" ")}`);
 
-      for (const line of content.split("\n")) {
-        if (line.trim() !== "") {
-          addHistory(line);
+      const files = args.slice(1);
+      for (const f of files) {
+        const content = readFileSync(f, "utf-8");
+
+        for (const line of content.split("\n")) {
+          if (line.trim() !== "") {
+            addHistory(line);
+          }
         }
       }
+      return;
     }
 
-    return;
-  } else if (args[0] === "-w") {
-    addHistory(`history ${args.join(" ")}`);
+    case "-w": {
+      addHistory(`history ${args.join(" ")}`);
 
-    const histories = getAllHistory();
-    writeFileSync(args[1], histories.join("\n") + "\n");
-    return;
-  } else {
-    addHistory(`history ${args.join(" ")}`);
+      const histories = getAllHistory();
+      writeFileSync(args[1], histories.join("\n") + "\n");
+      return;
+    }
+
+    case "-a": {
+      addHistory(`history ${args.join(" ")}`);
+
+      const histories = getAllHistory();
+      const data = histories.join("\n") + "\n";
+      appendFileSync(args[1], data);
+      return;
+    }
+
+    default:
+      addHistory(`history ${args.join(" ")}`);
   }
 
   const histories = getAllHistory();
-  const limit = args[0] ? Number(args[0]) : histories.length;
+  const limit = opt ? Number(opt) : histories.length;
   const start = Math.max(0, histories.length - limit);
 
   for (let i = start; i < histories.length; i++) {
