@@ -75,22 +75,29 @@ export function handleTypeCommand(
 // handle history command
 export function handleHistoryCommand(args: string[], write: (msg: string) => void): void {
   if (args[0] === "-r") {
-    for (let i = 1; i < args.length; i++) {
-      const file = readFileSync(args[i], "utf-8");
-      const lines = file.split("\n");
+    const files = args.slice(1);
 
-      for (const line of lines) {
+    for (const f of files) {
+      const content = readFileSync(f, "utf-8");
+
+      for (const line of content.split("\n")) {
         if (line.trim() !== "") {
           addHistory(line);
         }
       }
     }
+
+    addHistory(`history ${args.join(" ")}`);
     return;
   }
 
-  const histories = getAllHistory();
+  addHistory(`history ${args.join(" ")}`);
 
-  for (let i = 0; i < histories.length; i++) {
+  const histories = getAllHistory();
+  const limit = args[0] ? Number(args[0]) : histories.length;
+  const start = Math.max(0, histories.length - limit);
+
+  for (let i = start; i < histories.length; i++) {
     write(`    ${i + 1}  ${histories[i]}\n`);
   }
 }
