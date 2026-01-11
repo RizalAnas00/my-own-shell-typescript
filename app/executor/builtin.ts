@@ -56,7 +56,7 @@ export function tryBuiltin(
 
     case "exit":
       addHistory("exit")
-      appendHistory(args);
+      appendHistory([]);
       process.exit(0);
 
     default:

@@ -5,9 +5,10 @@ import { validTypeCommands } from "./types/validBuiltin";
 import { pathCompleteExec } from "./utils/pathLocate";
 import { print } from "./utils/print";
 import longestCommonPrefix from "./utils/lcp";
-import { addHistory } from "./utils/history";
+import { addHistory, initHistoryIndex } from "./utils/history";
 
 let tabPressedCount: number= 0;
+initHistoryIndex();
 
 const rl = createInterface({
   input: process.stdin,

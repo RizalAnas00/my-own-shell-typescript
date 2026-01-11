@@ -162,3 +162,4 @@ export function appendHistory(args: string[]) {
   appendFileSync(hispath, newEntries.join("\n") + "\n");
   lastHistoryWriteIndex = histories.length;
 }
+

@@ -7,6 +7,17 @@ const histFile =
     process.env.HISTFILE ??
     path.join(process.env.HOME || "", ".bash_history");
 
+export let lastHistoryWriteIndex = 0;
+
+export function initHistoryIndex() {
+  try {
+    const content = readFileSync(histFile, "utf-8");
+    lastHistoryWriteIndex = content.split("\n").filter(Boolean).length;
+  } catch {
+    lastHistoryWriteIndex = 0;
+  }
+}
+
 export function addHistory(command: string): void {
     historyCommands.push(command);
     // try {
