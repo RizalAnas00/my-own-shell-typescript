@@ -152,12 +152,13 @@ export function handleHistoryCommand(
 export function appendHistory(args: string[]) {
   const histories = getAllHistory();
   const newEntries = histories.slice(lastHistoryWriteIndex);
-  const content = newEntries.join("\n") + "\n";
+  if (newEntries.length === 0) return;
 
-  const hispath = args[1] ?? process.env.HISTFILE ?? path.join(process.env.HOME || "", ".bash_history");
-  
-  if (newEntries.length > 0) {
-    appendFileSync(hispath, content.endsWith("\n\n") ? content : content + "\n");
-    lastHistoryWriteIndex = histories.length;
-  }
+  const hispath =
+    args[1] ??
+    process.env.HISTFILE ??
+    path.join(process.env.HOME || "", ".bash_history");
+
+  appendFileSync(hispath, newEntries.join("\n") + "\n");
+  lastHistoryWriteIndex = histories.length;
 }

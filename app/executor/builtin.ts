@@ -8,6 +8,7 @@ import {
   handleTypeCommand
 } from "../types/command";
 import type { error } from "console";
+import { addHistory } from "../utils/history";
 
 export function tryBuiltin(
   tokens: string[],
@@ -54,6 +55,7 @@ export function tryBuiltin(
       return true;
 
     case "exit":
+      addHistory("exit")
       appendHistory(args);
       process.exit(0);
 
