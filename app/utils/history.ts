@@ -9,11 +9,11 @@ const histFile =
 
 export function addHistory(command: string): void {
     historyCommands.push(command);
-    try {
-        appendFileSync(histFile, `${command}\n`);
-    } catch {
-        // ignore
-    }
+    // try {
+    //     appendFileSync(histFile, `${command}\n`);
+    // } catch {
+    //     // ignore
+    // }
 }
 
 export function clearHistory(): void {

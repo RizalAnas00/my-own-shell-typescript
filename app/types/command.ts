@@ -109,14 +109,8 @@ export function handleHistoryCommand(
 
     case "-a": {
         addHistory(`history ${args.join(" ")}`);
+        appendHistory(args);
 
-        const histories = getAllHistory();
-        const newEntries = histories.slice(lastHistoryWriteIndex);
-
-        if (newEntries.length > 0) {
-            appendFileSync(args[1], newEntries.join("\n") + "\n");
-            lastHistoryWriteIndex = histories.length;
-        }
         return;
     }
 
@@ -132,5 +126,17 @@ export function handleHistoryCommand(
         }
     }
 
+  }
+}
+
+
+export function appendHistory(args: string[]) {
+  const histories = getAllHistory();
+  const newEntries = histories.slice(lastHistoryWriteIndex);
+  const hispath = args[1] ?? process.env.HISTFILE ?? path.join(process.env.HOME || "", ".bash_history");
+  
+  if (newEntries.length > 0) {
+      appendFileSync(hispath, newEntries.join("\n") + "\n");
+      lastHistoryWriteIndex = histories.length;
   }
 }

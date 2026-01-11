@@ -1,6 +1,7 @@
 import { writeSync } from "fs";
 import { print } from "../utils/print";
 import {
+  appendHistory,
   handleCatCommand,
   handleChangeDirectory,
   handleHistoryCommand,
@@ -53,6 +54,7 @@ export function tryBuiltin(
       return true;
 
     case "exit":
+      appendHistory(args);
       process.exit(0);
 
     default:
