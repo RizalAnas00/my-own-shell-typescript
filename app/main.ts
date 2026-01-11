@@ -8,7 +8,6 @@ import longestCommonPrefix from "./utils/lcp";
 import { addHistory, initHistoryIndex } from "./utils/history";
 
 let tabPressedCount: number= 0;
-initHistoryIndex();
 
 const rl = createInterface({
   input: process.stdin,
@@ -60,6 +59,8 @@ const rl = createInterface({
     return [[], line];
   }
 });
+
+initHistoryIndex();
 
 rl.on("line", (line) => {
   tabPressedCount = 0;
