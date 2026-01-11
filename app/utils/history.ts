@@ -15,14 +15,19 @@ export function clearHistory(): void {
 
 export function getAllHistory(): string[] {
     let allHistories: string[] = [];
-    const HISTPATH = path.join(process.env.HOME || "", ".bash_history");
+
+    const histFile =
+        process.env.HISTFILE ??
+        path.join(process.env.HOME || "", ".bash_history");
+
     try {
-        const content = readFileSync(HISTPATH, "utf-8");
-        allHistories = content.split("\n");
-    } catch {
-        // ignore
+        const content = readFileSync(histFile, "utf-8");
+        allHistories = content.split("\n").filter(Boolean);
+    } catch {}
+
+    for (const cmd of historyCommands) {
+        allHistories.push(cmd);
     }
 
-    new Array(historyCommands.length).fill("").map((_, i) => allHistories.push(historyCommands[i]));
     return allHistories;
 }

@@ -108,27 +108,29 @@ export function handleHistoryCommand(
     }
 
     case "-a": {
-      addHistory(`history ${args.join(" ")}`);
+        addHistory(`history ${args.join(" ")}`);
 
-      const histories = getAllHistory();
-      const newEntries = histories.slice(lastHistoryWriteIndex);
+        const histories = getAllHistory();
+        const newEntries = histories.slice(lastHistoryWriteIndex);
 
-      if (newEntries.length > 0) {
-        appendFileSync(args[1], newEntries.join("\n") + "\n");
-        lastHistoryWriteIndex = histories.length;
-      }
-      return;
+        if (newEntries.length > 0) {
+            appendFileSync(args[1], newEntries.join("\n") + "\n");
+            lastHistoryWriteIndex = histories.length;
+        }
+        return;
     }
 
-    default:
-      const histories = getAllHistory();
-      addHistory(`history ${args.join(" ")}`);
-      const limit = opt ? Number(opt) : histories.length;
-      const start = Math.max(0, histories.length - limit);
-    
-      for (let i = start; i < histories.length; i++) {
-        write(`    ${i + 1}  ${histories[i]}\n`);
-      }
-  }
+    default: {
+        addHistory(`history ${args.join(" ")}`);
 
+        const histories = getAllHistory();
+        const limit = opt ? Number(opt) : histories.length;
+        const start = Math.max(0, histories.length - limit);
+
+        for (let i = start; i < histories.length; i++) {
+            write(`    ${i + 1}  ${histories[i]}\n`);
+        }
+    }
+
+  }
 }
