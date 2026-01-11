@@ -83,7 +83,12 @@ export function handleHistoryCommand(
 
   switch (opt) {
     case "-r": {
-      addHistory(`history ${args.join(" ")}`);
+      const cmd = args.length === 0
+        ? "history"
+        : `history ${args.join(" ")}`;
+
+      addHistory(cmd);
+
 
       const files = args.slice(1);
       for (const f of files) {
@@ -99,7 +104,12 @@ export function handleHistoryCommand(
     }
 
     case "-w": {
-      addHistory(`history ${args.join(" ")}`);
+      const cmd = args.length === 0
+        ? "history"
+        : `history ${args.join(" ")}`;
+
+      addHistory(cmd);
+
 
       const histories = getAllHistory();
       writeFileSync(args[1], histories.join("\n") + "\n");
@@ -108,14 +118,24 @@ export function handleHistoryCommand(
     }
 
     case "-a": {
-        addHistory(`history ${args.join(" ")}`);
+        const cmd = args.length === 0
+          ? "history"
+          : `history ${args.join(" ")}`;
+
+        addHistory(cmd);
+
         appendHistory(args);
 
         return;
     }
 
     default: {
-        addHistory(`history ${args.join(" ")}`);
+        const cmd = args.length === 0
+          ? "history"
+          : `history ${args.join(" ")}`;
+
+        addHistory(cmd);
+
 
         const histories = getAllHistory();
         const limit = opt ? Number(opt) : histories.length;
@@ -128,7 +148,6 @@ export function handleHistoryCommand(
 
   }
 }
-
 
 export function appendHistory(args: string[]) {
   const histories = getAllHistory();
