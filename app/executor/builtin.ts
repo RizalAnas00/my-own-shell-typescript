@@ -1,14 +1,13 @@
 import { writeSync } from "fs";
 import { print } from "../utils/print";
 import {
-  appendHistory,
   handleCatCommand,
   handleChangeDirectory,
   handleHistoryCommand,
   handleTypeCommand
 } from "../types/command";
 import type { error } from "console";
-import { addHistory } from "../utils/history";
+import { addHistory, appendHistory } from "../utils/history";
 
 export function tryBuiltin(
   tokens: string[],
@@ -56,7 +55,7 @@ export function tryBuiltin(
 
     case "exit":
       addHistory("exit")
-      appendHistory([]);
+      appendHistory();
       process.exit(0);
 
     default:

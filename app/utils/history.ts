@@ -3,9 +3,9 @@ import path from "path";
 
 export let historyCommands: string[] = [];
 
-const histFile =
-    process.env.HISTFILE ??
-    path.join(process.env.HOME || "", ".bash_history");
+export const histFile =
+  process.env.HISTFILE ??
+  path.join(process.env.HOME || "", ".bash_history");
 
 export let lastHistoryWriteIndex = 0;
 
@@ -19,29 +19,35 @@ export function initHistoryIndex() {
 }
 
 export function addHistory(command: string): void {
-    historyCommands.push(command);
-    // try {
-    //     appendFileSync(histFile, `${command}\n`);
-    // } catch {
-    //     // ignore
-    // }
+  historyCommands.push(command);
 }
 
 export function clearHistory(): void {
-    historyCommands = [];
+  historyCommands = [];
 }
 
 export function getAllHistory(): string[] {
-    let allHistories: string[] = [];
+  let fileHistory: string[] = [];
 
-    try {
-        const content = readFileSync(histFile, "utf-8");
-        allHistories = content.split("\n").filter(Boolean);
-    } catch {}
+  try {
+    const content = readFileSync(histFile, "utf-8");
+    fileHistory = content.split("\n").filter(Boolean);
+  } catch {}
 
-    for (const cmd of historyCommands) {
-        allHistories.push(cmd);
-    }
+  return [...fileHistory, ...historyCommands];
+}
 
-    return allHistories;
+export function appendHistory(targetFile?: string) {
+  const histories = getAllHistory();
+  const newEntries = histories.slice(lastHistoryWriteIndex);
+
+  if (newEntries.length === 0) return;
+
+  const file =
+    targetFile ??
+    process.env.HISTFILE ??
+    path.join(process.env.HOME || "", ".bash_history");
+
+  appendFileSync(file, newEntries.join("\n") + "\n");
+  lastHistoryWriteIndex = histories.length;
 }

@@ -1,14 +1,14 @@
-import { ChildProcess, spawn } from "child_process";
 import path from "path";
-import { pathLocateExec } from "../utils/pathLocate";
-import { appendFileSync, readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { commandNotFound, typeNotFound } from "../utils/notFound";
 import { validTypeCommands } from "../types/validBuiltin";
 import { spawnCommand } from "../executor/spawnCommand";
-import { addHistory, getAllHistory } from "../utils/history";
-import { isNumberObject } from "util/types";
-
-let lastHistoryWriteIndex = 0;
+import {
+  addHistory,
+  getAllHistory,
+  appendHistory
+} from "../utils/history";
+import { pathLocateExec } from "../utils/pathLocate";
 
 export function handleCustomCommand(
   command: string[],
@@ -34,8 +34,8 @@ export function handleCustomCommand(
 export function handleChangeDirectory(
   args: string[],
   writeErr: (msg: string) => void
-): void {
-  const dir: string = args[0] || process.env.HOME || "";
+) {
+  const dir = args[0] || process.env.HOME || "";
   try {
     if (dir === "~") process.chdir(process.env.HOME || "");
     else process.chdir(dir);
@@ -48,7 +48,7 @@ export function handleCatCommand(
   args: string[],
   writeOut: (msg: string) => void,
   writeErr: (msg: string) => void
-): void {
+) {
   for (const file of args) {
     try {
       writeOut(readFileSync(file, "utf-8"));
@@ -61,8 +61,8 @@ export function handleCatCommand(
 export function handleTypeCommand(
   args: string[],
   write: (msg: string) => void
-): void {
-  const cmd: string = args[0];
+) {
+  const cmd = args[0];
 
   if (validTypeCommands.includes(cmd)) {
     write(`${cmd} is a shell builtin\n`);
@@ -74,92 +74,46 @@ export function handleTypeCommand(
   else typeNotFound(cmd);
 }
 
-// handle history command
 export function handleHistoryCommand(
   args: string[],
   write: (msg: string) => void
-): void {
+) {
   const opt = args[0];
 
   switch (opt) {
     case "-r": {
-      const cmd = args.length === 0
-        ? "history"
-        : `history ${args.join(" ")}`;
-
-      addHistory(cmd);
-
-
-      const files = args.slice(1);
-      for (const f of files) {
+      addHistory(`history ${args.join(" ")}`.trim());
+      for (const f of args.slice(1)) {
         const content = readFileSync(f, "utf-8");
-
         for (const line of content.split("\n")) {
-          if (line.trim() !== "") {
-            addHistory(line);
-          }
+          if (line.trim()) addHistory(line);
         }
       }
       return;
     }
 
     case "-w": {
-      const cmd = args.length === 0
-        ? "history"
-        : `history ${args.join(" ")}`;
-
-      addHistory(cmd);
-
-
+      addHistory(`history ${args.join(" ")}`.trim());
       const histories = getAllHistory();
       writeFileSync(args[1], histories.join("\n") + "\n");
-      lastHistoryWriteIndex = histories.length;
       return;
     }
 
     case "-a": {
-        const cmd = args.length === 0
-          ? "history"
-          : `history ${args.join(" ")}`;
-
-        addHistory(cmd);
-
-        appendHistory(args);
-
-        return;
+      addHistory(`history ${args.join(" ")}`.trim());
+      appendHistory(args[1]);
+      return;
     }
 
     default: {
-        const cmd = args.length === 0
-          ? "history"
-          : `history ${args.join(" ")}`;
+      addHistory(`history ${args.join(" ")}`.trim());
+      const histories = getAllHistory();
+      const limit = opt ? Number(opt) : histories.length;
+      const start = Math.max(0, histories.length - limit);
 
-        addHistory(cmd);
-
-
-        const histories = getAllHistory();
-        const limit = opt ? Number(opt) : histories.length;
-        const start = Math.max(0, histories.length - limit);
-
-        for (let i = start; i < histories.length; i++) {
-            write(`    ${i + 1}  ${histories[i]}\n`);
-        }
+      for (let i = start; i < histories.length; i++) {
+        write(`    ${i + 1}  ${histories[i]}\n`);
+      }
     }
-
   }
 }
-
-export function appendHistory(args: string[]) {
-  const histories = getAllHistory();
-  const newEntries = histories.slice(lastHistoryWriteIndex);
-  if (newEntries.length === 0) return;
-
-  const hispath =
-    args[1] ??
-    process.env.HISTFILE ??
-    path.join(process.env.HOME || "", ".bash_history");
-
-  appendFileSync(hispath, newEntries.join("\n") + "\n");
-  lastHistoryWriteIndex = histories.length;
-}
-
